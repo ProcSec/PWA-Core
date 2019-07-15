@@ -45,13 +45,13 @@ export default class SettingsCheckProvider {
         let rc
         try {
             ri.forEach((r) => {
-                if (!Object.prototype.hasOwnProperty.call(r, "onfail")) r.onfail = () => { }
-                if (!Object.prototype.hasOwnProperty.call(r, "onupdate")) r.onupdate = () => { }
+                if (!("onfail" in r)) r.onfail = () => { }
+                if (!("onupdate" in r)) r.onupdate = () => { }
 
                 rc = r
 
                 try {
-                    if (Object.prototype.hasOwnProperty.call(r, "checker")) success = r.checker.set(value)
+                    if ("checker" in r) success = r.checker.set(value)
                     else success = true
                 } catch (e) {
                     success = false

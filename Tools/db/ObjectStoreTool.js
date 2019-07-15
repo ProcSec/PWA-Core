@@ -55,7 +55,7 @@ export default class ObjectStoreTool {
                         self.size += JSON.stringify(cursor.value).length
 
                         Object.keys(cursor.value).forEach((e) => {
-                            if (Object.prototype.hasOwnProperty.call(cursor.value, e)
+                            if (e in cursor.value
                                 && cursor.value[e] instanceof Blob) {
                                 self.size += cursor.value[e]
                             }
@@ -179,7 +179,7 @@ export default class ObjectStoreTool {
                 size += JSON.stringify(cursor.value).length
 
                 Object.keys(cursor.value).forEach((e) => {
-                    if (Object.prototype.hasOwnProperty.call(cursor.value, e)
+                    if (e in cursor.value
                         && cursor.value[e] instanceof Blob) {
                         size += cursor.value[e]
                     }
