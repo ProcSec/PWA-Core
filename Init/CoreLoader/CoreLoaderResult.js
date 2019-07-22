@@ -1,5 +1,5 @@
 export default class CoreLoaderResult {
-    type = 1
+    type = 0
 
     constructor(answer = null, data = null) {
         this._answer = answer

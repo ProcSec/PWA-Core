@@ -1,5 +1,5 @@
 import CoreLoaderResult from "./CoreLoaderResult"
 
 export default class CoreLoaderSkip extends CoreLoaderResult {
-    type = 2
+    type = 1
 }

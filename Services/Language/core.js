@@ -27,7 +27,7 @@ export default class LanguageCore {
 
         if (navigator.languages) {
             const lang = navigator.languages.find(e => this.isSupported(e.slice(0, 2)))
-            return lang.slice(0, 2)
+            return (lang ? lang.slice(0, 2) : this.fallbackDefault)
         }
         if (navigator.language) {
             if (this.isSupported(navigator.language.slice(0, 2))) {

@@ -65,8 +65,12 @@ class CoreLoader {
         const task = this._getTask(id)
         let res
 
-        if (task.async) res = await this._asyncRunner(task)
-        res = await this._queueRunnerRecursive(task)
+        try {
+            if (task.async) res = await this._asyncRunner(task)
+            res = await this._queueRunnerRecursive(task)
+        } catch (e) {
+            res = e
+        }
 
         this._emitTaskDone(id)
 
@@ -86,7 +90,10 @@ class CoreLoader {
 
         task.result = result
 
-        if (caught && !task.alwaysResolve) throw result
+        if (caught && !task.alwaysResolve) {
+            if (result.state === 1) this._loadSuccessCache = false
+            throw result
+        }
         return result
     }
 
@@ -125,7 +132,10 @@ class CoreLoader {
         currentTask.task.result = result
 
         if (!caught || currentTask.alwaysResolve) currentTask.promiseResolve(result)
-        else currentTask.promiseReject(result)
+        else {
+            if (result.state === 1) this._loadSuccessCache = false
+            currentTask.promiseReject(result)
+        }
 
         this._queueRunnerRecursive()
         return true
@@ -135,7 +145,7 @@ class CoreLoader {
         let state = 0
         let answer
         let data
-        let type = 1
+        let type = 0
 
         if (this._loadSuccessCache === false) return false
 
@@ -155,11 +165,8 @@ class CoreLoader {
                 ({ explanation: answer, data } = e.info)
             } else if (e instanceof Error) {
                 answer = e.message
-                data = `${e.fileName}:${e.lineNumber}`
+                data = e.stack
             }
-
-            // TODO: use Report
-            console[(state === 2 ? "warn" : "error")](e)
         }
 
         if (state === 2 && this._loadSuccessCache === 0) this._loadSuccessCache = 2
@@ -174,7 +181,11 @@ class CoreLoader {
     }
 
     static _emitTaskDone(id) {
-        this._doneListeners.forEach(el => el(this.taskInfo(id)))
+        try {
+            this._doneListeners.forEach(el => el(this.taskInfo(id)))
+        } catch (e) {
+            // No errors
+        }
     }
 
     static _itemToReport(el) {
