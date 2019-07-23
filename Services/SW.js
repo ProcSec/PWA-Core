@@ -6,13 +6,29 @@ import SettingsStorage from "./Settings/SettingsStorage"
 export default class SW {
     static updatePending = false
 
+    static registration = false
+
     static userPrompt() { }
+
+    static unregister() {
+        if ("serviceWorker" in navigator) {
+            return this.registration.unregister()
+        }
+        return false
+    }
+
+    static update() {
+        if ("serviceWorker" in navigator) {
+            return this.registration.update()
+        }
+        return false
+    }
 
     static register() {
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("./sw.js", { scope: "/" })
-                .then(this.success)
-                .catch(this.fail)
+                .then(e => this.success(e))
+                .catch(e => this.fail(e))
             return true
         }
         return false
@@ -24,6 +40,7 @@ export default class SW {
         if (!navigator.serviceWorker.controller) {
             return
         }
+        this.registration = registration
 
         let preventDevToolsReloadLoop
         navigator.serviceWorker.addEventListener("controllerchange", (event) => {
