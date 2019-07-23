@@ -28,78 +28,54 @@ export default class DBTool {
     }
 
     delete() {
-        deleteDB(this.DBName)
+        return deleteDB(this.DBName)
     }
 
-    getObjectStore(name, type = false) {
-        return new Promise((resolve, reject) => {
-            this.getTransaction(name, type).then(e => e.objectStore(name))
-                .then(os => resolve(os))
-        })
+    async getObjectStore(name, type = false) {
+        return (await this.getTransaction(name, type)).objectStore(name)
     }
 
-    getTablesList() {
-        return new Promise((resolve, reject) => {
-            this.getConnection()
-                .then((db) => {
-                    const names = [...db.objectStoreNames]
-                    resolve(names)
-                })
-        })
+    async getTablesList() {
+        return [...(await this.getConnection()).objectStoreNames]
     }
 
-    getDBSize() {
-        return new Promise((resolve, reject) => {
-            this.getAllTablesSizes()
-                .then(
-                    res => resolve(Object.values(res)
-                        .reduce((collector, i) => collector + i, 0)),
-                )
-        })
+    async getDBSize() {
+        return Object.values(await this.getAllTablesSizes())
+            .reduce((collector, i) => collector + i, 0)
     }
 
-    getConnection() {
-        if (this.DBConnection !== null) return Promise.resolve(this.DBConnection)
+    async getConnection() {
+        if (this.DBConnection !== null) return this.DBConnection
 
         return this.openDB()
     }
 
-    openDB() {
-        return new Promise((resolve, reject) => {
-            openDB(this.DBName, this.DBVersion,
-                {
-                    upgrade: this.upgradeAgent,
-                    blocked: this.blockedAgent,
-                    blocking: this.blockingAgent,
-                })
-                .then((res) => {
-                    this.DBConnection = res
-                    resolve(res)
-                })
-        })
+    async openDB() {
+        const res = await openDB(this.DBName, this.DBVersion,
+            {
+                upgrade: this.upgradeAgent,
+                blocked: this.blockedAgent,
+                blocking: this.blockingAgent,
+            })
+
+        this.DBConnection = res
+        return res
     }
 
-    getTransaction(name, type = false) {
-        return new Promise((resolve, reject) => {
-            this.getConnection()
-                .then((db) => {
-                    resolve(db.transaction(name, (type ? "readwrite" : "readonly")))
-                })
-        })
+    async getTransaction(name, type = false) {
+        return (await this.getConnection())
+            .transaction(name, (type ? "readwrite" : "readonly"))
     }
 
-    getAllTablesSizes() {
-        return new Promise(async (resolve, reject) => {
-            const tables = await this.getTablesList()
-            const sizes = await Promise.all(tables.map(r => new ObjectStoreTool(this, r).getSize()))
+    async getAllTablesSizes() {
+        const tables = await this.getTablesList()
+        const sizes = await Promise.all(tables.map(r => new ObjectStoreTool(this, r).getSize()))
 
-            const r = {}
-            for (let i = 0; i < tables.length; i++) {
-                r[tables[i]] = sizes[i]
-            }
-
-            resolve(r)
-        })
+        const r = {}
+        for (let i = 0; i < tables.length; i++) {
+            r[tables[i]] = sizes[i]
+        }
+        return r
     }
 
     OSTool(name) {

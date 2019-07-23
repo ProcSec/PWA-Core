@@ -39,8 +39,7 @@ export default class ObjectStoreTool {
     }
 
     async getOS(type = false) {
-        const r = await this.connection.getObjectStore(this.name, type)
-        return r
+        return this.connection.getObjectStore(this.name, type)
     }
 
     async getSize() {
@@ -109,9 +108,8 @@ export default class ObjectStoreTool {
     }
 
     async createCursor(range = null, direction = "next", type = false) {
-        const r = await (await this.getOS(type))
+        return (await this.getOS(type))
             .openCursor(this.constructor.generateIDBRange(range), direction)
-        return r
     }
 
     async getWhere(cursorInstance = null, ...conditions) {

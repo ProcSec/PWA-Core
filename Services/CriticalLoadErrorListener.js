@@ -2,22 +2,29 @@ import LoadState from "./LoadState"
 
 
 export default class CriticalLoadErrorListener {
-    static _listener = (e) => {
+    static _listener = (e, consoleIt = true) => {
         function escapeHTML(unsafeText) {
             const div = document.createElement("div")
             div.innerText = unsafeText
             return div.innerHTML
         }
 
-        console.error(e)
+        if (consoleIt) console.error(e)
 
-        const error = (e.message ? `${e.message} on ${e.filename}:${e.lineno}:${e.colno}` : "No debug info available")
+        let error
+        if (typeof e === "object") {
+            const filename = e.filename || "[unknown file]"
+            const lineno = e.lineno || "?"
+            const colno = e.colno || "??"
+
+            error = (e.message ? `${e.message} on ${filename}:${lineno}:${colno}` : "No debug info available")
+        } else error = String(e)
         const ua = window.navigator.userAgent
 
         document.body.innerHTML = `
 <h1 style="color: red;">Fatal Error</h1>
 <p><i>Failed to initiate the app</i></p>
-<pre>${escapeHTML(error)}
+<pre style="max-width: 100vw; overflow: auto; user-select: all;">${escapeHTML(error)}
 ${escapeHTML(ua)}</pre>`
     }
 

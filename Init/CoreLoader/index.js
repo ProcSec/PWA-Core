@@ -41,7 +41,7 @@ class CoreLoader {
 
     static getResult(id) {
         const task = this._getTask(id)
-        if (!("result" in task)) return null
+        if (!task || !("result" in task)) return false
         return task.result
     }
 
@@ -165,7 +165,7 @@ class CoreLoader {
                 ({ explanation: answer, data } = e.info)
             } else if (e instanceof Error) {
                 answer = e.message
-                data = e.stack
+                data = e
             }
         }
 

@@ -34,7 +34,7 @@ export default class SettingsStorage {
         try {
             if (typeof setting !== "string") throw new Error("Incorrect key")
             const db = this.db.OSTool(this.ObjectStoreNames[0])
-            const res = (await db.get(setting))
+            const res = await db.get(setting)
             if (res === undefined) {
                 let props = SettingsCheckProvider.get(setting, "user")
                 if (typeof props !== "object") return undefined
@@ -118,7 +118,7 @@ export default class SettingsStorage {
 
             return resv
         } catch (e) {
-            Report.write("Failed getting flag", e)
+            Report.write("Failed getting flag", flag, e)
             return undefined
         }
     }
@@ -154,7 +154,7 @@ export default class SettingsStorage {
             si[3](value, ov, flag, si[2])
             return true
         } catch (e) {
-            Report.write("Failed setting flag", e)
+            Report.write("Failed setting flag", flag, e)
             return false
         }
     }

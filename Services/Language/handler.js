@@ -27,14 +27,11 @@ function callLibrary(name, data, p, string) {
     return library[name](data, p, string)
 }
 
-function $(string, p) {
+function $(string, p = undefined, useFallback = true) {
     try {
         if (strings === undefined) {
-            const loaded = LanguageCore.language
-            // eslint-disable-next-line prefer-destructuring
-            strings = loaded.strings
-            // eslint-disable-next-line prefer-destructuring
-            library = loaded.library
+            const loaded = LanguageCore.language;
+            ({ strings, library } = loaded)
         }
 
         if (typeof string !== "string") throw new TypeError("Localization key is string only")
@@ -89,8 +86,11 @@ function $(string, p) {
 
         throw new Error("Unsupported Smart-String")
     } catch (e) {
-        Report.write("Language string error", e)
-        return fallback(string)
+        if (useFallback) {
+            Report.write("Language string error", e)
+            return fallback(string)
+        }
+        throw e
     }
 }
 
