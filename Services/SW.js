@@ -26,9 +26,13 @@ export default class SW {
 
     static register() {
         if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("./sw.js", { scope: "/" })
-                .then(e => this.success(e))
-                .catch(e => this.fail(e))
+            try {
+                navigator.serviceWorker.register("/sw.js", { scope: "/" })
+                    .then(e => this.success(e))
+                    .catch(e => this.fail(e))
+            } catch (e) {
+                return false
+            }
             return true
         }
         return false

@@ -1,9 +1,11 @@
 import FieldChecker from "@Core/Tools/validation/fieldChecker"
+import randomString from "@Core/Tools/objects/randomString"
 import CoreLoaderWarning from "./CoreLoaderWarning"
 import CoreLoaderThrowable from "./CoreLoaderThrowable"
 import CoreLoaderError from "./CoreLoaderError"
 import CoreLoaderResult from "./CoreLoaderResult"
 import CoreLoaderSkip from "./CoreLoaderSkip"
+
 
 class CoreLoader {
     static _syncQueue = []
@@ -13,6 +15,12 @@ class CoreLoader {
     static _reg = new Map()
 
     static _doneListeners = new Set()
+
+    static _sessionId = `${Math.floor(Date.now() / 8640000).toString(36)}/${randomString(9)}`
+
+    static get sessionID() {
+        return this._sessionId
+    }
 
     _loadSuccessCache = true
 

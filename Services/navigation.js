@@ -1,47 +1,48 @@
 import FieldsContainer from "@Core/Tools/validation/fieldsContainer"
 import FieldChecker from "@Core/Tools/validation/fieldChecker"
-import { recoveryModeHash, isRecoveryMode, OutputRecovery } from "@App/debug/recovery"
-import Toast from "@Environment/Library/DOM/elements/toast"
 import { Nav } from "@Environment/Library/DOM/buildBlock"
-import { $$ } from "./Language/handler"
+import { CoreLoader } from "@Core/Init/CoreLoader"
 import Report from "./report"
-import WindowManager from "./SimpleWindowManager"
+
+
+window.history.replaceState({ pointer: 0, session: CoreLoader.sessionID }, "")
 
 export default class Navigation {
     static prefix = "/"
 
-    static paramsDelimeter = "/?/"
+    static paramsDelimeter = "/+/"
 
     static fallbackSplitter = "/"
 
     static modulesRegister = []
 
-    static get hash() {
-        const hash = window.location.hash.slice(1)
+    static get url() {
+        const url = window.location.pathname
 
         if (typeof this.prefix === "string"
             && this.prefix !== "") {
-            if (hash.indexOf(this.prefix) !== 0) return ({ error: 2, info: "Incorrect prefix" })
+            if (url.indexOf(this.prefix) !== 0) return ({ error: 2, info: "Incorrect prefix" })
         }
-        return hash.slice(this.prefix.length)
+        return url.slice(this.prefix.length)
     }
 
-    static set hash(hash) {
-        if (typeof hash === "object") {
+    static set url(url) {
+        if (typeof url === "object") {
             new FieldsContainer([
                 ["module"],
                 {
                     module: new FieldChecker({ type: "string" }),
                     params: new FieldChecker({ type: "object" }),
                 },
-            ]).set(hash)
-            hash.params = hash.params || {}
-            const stringHash = `${this.prefix}${hash.module}${(Object.keys(hash.params).length > 0 ? `${this.paramsDelimeter}${this.paramsGenerator(hash.params)}` : "")}`
-            this.hash = stringHash
-            return stringHash
+            ]).set(url)
+            url.params = url.params || {}
+            const stringURL = `${this.prefix}${url.module}${(Object.keys(url.params).length > 0 ? `${this.paramsDelimeter}${this.paramsGenerator(url.params)}` : "")}`
+            this.url = stringURL
+            return stringURL
         }
-        window.location.hash = hash.toString()
-        return this.parseHash(hash)
+        window.history.pushState({ pointer: ++this.pointer, session: CoreLoader.sessionID }, "", url)
+        this.listener()
+        return this.parseURL(url)
     }
 
     static history = []
@@ -52,7 +53,7 @@ export default class Navigation {
 
     static historyCurrentFuture = []
 
-    static historyLength = window.history.length
+    static pointer = 0
 
     static get Current() {
         return this.historyCurrent[this.historyCurrent.length - 1]
@@ -98,34 +99,34 @@ export default class Navigation {
     }
 
     static get parse() {
-        return this.parseHash()
+        return this.parseURL()
     }
 
-    static parseHash(hash = this.hash) {
+    static parseURL(url = this.url) {
         let module = ""
         let paramsString = ""
         let params = []
 
-        hash = hash.toString()
+        url = url.toString()
         // Is Empty
-        if (hash === "") return ({ error: 1, info: "Hash is empty" })
+        if (url === "") return ({ error: 1, info: "URL is empty" })
 
         // Params splitter
-        const paramsDelimeter = hash.indexOf(this.paramsDelimeter)
+        const paramsDelimeter = url.indexOf(this.paramsDelimeter)
         if (paramsDelimeter !== -1) {
-            module = decodeURIComponent(hash.slice(0, paramsDelimeter))
-            paramsString = hash.slice(paramsDelimeter + this.paramsDelimeter.length)
+            module = decodeURIComponent(url.slice(0, paramsDelimeter))
+            paramsString = url.slice(paramsDelimeter + this.paramsDelimeter.length)
             params = this.paramsParser(paramsString)
         } else {
-            module = decodeURIComponent(hash)
+            module = decodeURIComponent(url)
         }
 
-        hash = decodeURIComponent(hash)
+        url = decodeURIComponent(url)
 
         const r = {
             module,
             params,
-            hash,
+            url,
         }
 
         return (r)
@@ -141,46 +142,29 @@ export default class Navigation {
     }
 
     static get whatHappened() {
-        // SOURCE: https://gist.github.com/sstephenson/739659
-        // TODO: Better strategy
+        if (this.history.length === 0) this.history.push(this.url)
 
-        if (this.history.length === 0) this.history.push(this.hash)
-
-        // const history = window.history.length
-        // const { hash } = this
-
-        // if (this.historyLength !== history) {
+        if (window.history.state.session !== CoreLoader.sessionID) return "change"
+        if (window.history.state.pointer === this.pointer) return "change"
+        if (window.history.state.pointer > this.pointer) return "forward"
+        if (window.history.state.pointer < this.pointer) return "back"
         return "change"
-        // }
-
-        // if (this.history[this.history.length - 2] === hash) {
-        //    return "forward"
-        // }
-
-        // return "back"
     }
 
     static listener(manual) {
-        if (window.location.hash === recoveryModeHash) {
-            // TODO: Localizations
-            if (!isRecoveryMode()) Toast.add($$("@recovery_mode/enter"))
-            else OutputRecovery("Recovery Log called")
-            return true
-        }
-
         const event = manual || this.whatHappened
+        this.pointer = window.history.state.pointer
 
         const parsed = this.parse
 
-        const { hash } = this
+        const { url } = this
 
         if ((typeof parsed === "object" && "error" in parsed)
-            || (typeof hash === "object" && "error" in hash)) throw Error(parsed.info)
+            || (typeof url === "object" && "error" in url)) throw Error(parsed.info)
 
         if (event === "change") {
-            this.history.push(hash)
+            this.history.push(url)
             this.historyCurrent.push(Object.create(null))
-            this.historyLength = window.history.length
             Report.writeNoTrace("%c :NAV ", "background: #3f51b5; color: #ffffff", parsed)
             const navigationEvent = new CustomEvent("appNavigation", { detail: { type: "change", parsed } })
             window.dispatchEvent(navigationEvent)
@@ -193,7 +177,7 @@ export default class Navigation {
             Report.writeNoTrace("%c <NAV ", "background: #3f51b5; color: #ffffff", parsed)
             const navigationEvent = new CustomEvent("appNavigation", { detail: { type: "back", parsed } })
             window.dispatchEvent(navigationEvent)
-            return WindowManager.navBack(parsed.module, parsed.params)
+            return this.go(parsed.module, parsed.params)
         }
 
         if (event === "forward") {
@@ -202,7 +186,7 @@ export default class Navigation {
             Report.writeNoTrace("%c >NAV ", "background: #3f51b5; color: #ffffff", parsed)
             const navigationEvent = new CustomEvent("appNavigation", { detail: { type: "forward", parsed } })
             window.dispatchEvent(navigationEvent)
-            return WindowManager.navForward(parsed.module, parsed.params)
+            return this.go(parsed.module, parsed.params)
         }
 
         return false
@@ -215,8 +199,6 @@ export default class Navigation {
             if (manual !== undefined) this.InitNavigationError()
             return false
         }
-
-        Nav.highlight({ id: module })
         callbacks.forEach((e) => {
             if ("callback" in e && typeof e.callback === "function") e.callback(module, params)
         })
@@ -224,14 +206,14 @@ export default class Navigation {
     }
 
     static InitNavigationError() {
-        this.hash = {
+        this.url = {
             module: "timetable",
             params: {},
         }
     }
 
     static defaultScreen() {
-        this.hash = {
+        this.url = {
             module: "timetable",
             params: {},
         }
