@@ -4,7 +4,7 @@ import FadeIn from "@Environment/Library/Animations/fadeIn"
 import CSSAnimation from "@DOMPath/Animation/Classes/CSSAnimation"
 import EaseOutQuad from "@DOMPath/Animation/Library/Timing/easeOutQuad"
 import EaseOutCubic from "@DOMPath/Animation/Library/Timing/easeOutCubic"
-import Animation from "@DOMPath/Animation/Classes/Animation";
+import Animation from "@DOMPath/Animation/Classes/Animation"
 import SettingsStorage from "./Settings/SettingsStorage"
 import Navigation from "./navigation"
 
@@ -56,10 +56,6 @@ export default class WindowManager {
     }
 
     static get fullscreen() { return document.webkitFullscreenElement !== null }
-
-    static newLayer() {
-        return Error("Only Windows and Overlays in this implementation")
-    }
 
     static newWindow(h) {
         const w = new DOM({
@@ -240,8 +236,7 @@ export default class WindowManager {
         const generated = w
 
         this.overlays.push([generated, options])
-
-        this.controlOver.clear(generated)
+        this.controlOver.render(generated)
 
         this.OverContainer(true)
 
@@ -295,11 +290,10 @@ export default class WindowManager {
     }
 
     static popOverlay() {
-        this.controlOver.clear()
+        this.currentOverlay.element.destructSelf()
         this.overlays.pop()
         const e = this.currentOverlay
         if (e.element !== undefined && e.element.elementParse.native !== undefined) {
-            this.controlOver.render(e.element)
             if (e.options.transclick) this.OverlayClicks(true)
             else this.OverlayClicks(false)
         } else this.OverContainer(false)
