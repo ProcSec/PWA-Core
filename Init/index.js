@@ -2,6 +2,7 @@ import "@App/loaders/Presets"
 import "@App/debug/recovery"
 
 import "@EnvResources/styles/constructor.css"
+import "@Resources/styles/constructor.css"
 
 import "./Loaders"
 
