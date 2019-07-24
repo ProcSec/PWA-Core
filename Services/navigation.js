@@ -205,17 +205,37 @@ export default class Navigation {
         return true
     }
 
-    static InitNavigationError() {
-        this.url = {
-            module: "timetable",
-            params: {},
-        }
+    static _InitErrorHandler() {
+        /*
+                this.url = {
+                    module: "name",
+                    params: {},
+                } or call page rendering
+                */
     }
 
-    static defaultScreen() {
-        this.url = {
-            module: "timetable",
-            params: {},
-        }
+    static _defaultScreenHandler() {
+        /*
+                this.url = {
+                    module: "name",
+                    params: {},
+                } or call page rendering
+                */
+    }
+
+    static get InitNavigationError() {
+        return this._InitErrorHandler
+    }
+
+    static get defaultScreen() {
+        return this._defaultScreenHandler
+    }
+
+    static set InitNavigationError(s) {
+        this._InitErrorHandler = s
+    }
+
+    static set defaultScreen(s) {
+        this._defaultScreenHandler = s
     }
 }
