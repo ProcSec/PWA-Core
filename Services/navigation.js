@@ -166,8 +166,9 @@ export default class Navigation {
             this.history.push(url)
             this.historyCurrent.push(Object.create(null))
             Report.writeNoTrace("%c :NAV ", "background: #3f51b5; color: #ffffff", parsed)
-            const navigationEvent = new CustomEvent("appNavigation", { detail: { type: "change", parsed } })
+            const navigationEvent = new CustomEvent("appNavigation", { cancelable: true, detail: { type: "change", parsed } })
             window.dispatchEvent(navigationEvent)
+            if (navigationEvent.defaultPrevented) return null
             return this.go(parsed.module, parsed.params, manual)
         }
 
@@ -175,8 +176,9 @@ export default class Navigation {
             this.historyFuture.push(this.history.pop())
             this.historyCurrentFuture.push(this.historyCurrent.pop())
             Report.writeNoTrace("%c <NAV ", "background: #3f51b5; color: #ffffff", parsed)
-            const navigationEvent = new CustomEvent("appNavigation", { detail: { type: "back", parsed } })
+            const navigationEvent = new CustomEvent("appNavigation", { cancelable: true, detail: { type: "back", parsed } })
             window.dispatchEvent(navigationEvent)
+            if (navigationEvent.defaultPrevented) return null
             return this.go(parsed.module, parsed.params)
         }
 
@@ -184,8 +186,9 @@ export default class Navigation {
             this.history.push(this.historyFuture.pop())
             this.historyCurrent.push(this.historyCurrentFuture.pop())
             Report.writeNoTrace("%c >NAV ", "background: #3f51b5; color: #ffffff", parsed)
-            const navigationEvent = new CustomEvent("appNavigation", { detail: { type: "forward", parsed } })
+            const navigationEvent = new CustomEvent("appNavigation", { cancelable: true, detail: { type: "forward", parsed } })
             window.dispatchEvent(navigationEvent)
+            if (navigationEvent.defaultPrevented) return null
             return this.go(parsed.module, parsed.params)
         }
 

@@ -54,7 +54,7 @@ export default class DBUserPresence {
         this._register.push(data);
 
         (async () => {
-            if (await data.size() > await data.quota()) {
+            if ("quota" in data && await data.size() > await data.quota()) {
                 const autoClean = data.functions.find(e => e.name === "auto-clean")
                 if (autoClean) autoClean.handler()
             }

@@ -74,14 +74,14 @@ export default class SettingsStorage {
             if (!si[0]) {
                 const res = await si[1](value, setting, async (v, ou = true) => {
                     await db.put({ key: setting, value: v })
-                    if (ou) si[3](v, ov, setting, si[2])
+                    if (ou) await si[3](v, ov, setting, si[2])
                 })
 
                 return (!!res)
             }
 
             await db.put({ key: setting, value })
-            si[3](value, ov, setting, si[2])
+            await si[3](value, ov, setting, si[2])
             return true
         } catch (e) {
             Report.write("Failed saving settings", e)
@@ -142,16 +142,16 @@ export default class SettingsStorage {
             const ov = await this.getFlag(flag)
             const db = this.db.OSTool(this.ObjectStoreNames[1])
             if (!si[0]) {
-                const res = si[1](value, flag, async (v, ou = true) => {
+                const res = await si[1](value, flag, async (v, ou = true) => {
                     await db.put({ key: flag, value: v })
-                    if (ou) si[3](v, ov, flag, si[2])
+                    if (ou) await si[3](v, ov, flag, si[2])
                 })
 
                 return (!!res)
             }
 
             await db.put({ key: flag, value })
-            si[3](value, ov, flag, si[2])
+            await si[3](value, ov, flag, si[2])
             return true
         } catch (e) {
             Report.write("Failed setting flag", flag, e)
