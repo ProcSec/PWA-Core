@@ -38,7 +38,7 @@ function $(string, p = undefined, useFallback = true) {
 
         let data = strings[string]
 
-        if (string.match(/^@[a-zA-Z_/]+[^/]$/)) {
+        if (string.match(/^@[a-zA-Z0-9_/]+[^/]$/)) {
             const groups = string.substr(1).split("/")
             data = strings
             string = groups[groups.length - 1]

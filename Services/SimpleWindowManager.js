@@ -219,7 +219,9 @@ export default class WindowManager {
                 if (e[0] === this.currentOverlay.element) {
                     this.popOverlay()
                     return true
-                } this.overlays.splice(i, 1)
+                }
+                e[0].destructSelf()
+                this.overlays.splice(i, 1)
                 return true
             },
         })
