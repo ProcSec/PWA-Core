@@ -14,8 +14,7 @@ export default class ObjectStoreTool {
                 if (!(propKey in target)) {
                     return async (...params) => {
                         const os = await target.getOS(true)
-                        const r = await os[propKey](...params)
-                        return r
+                        return os[propKey](...params)
                     }
                 }
                 return target[propKey]
@@ -38,7 +37,7 @@ export default class ObjectStoreTool {
         return this.getByCount()
     }
 
-    async getOS(type = false) {
+    getOS(type = false) {
         return this.connection.getObjectStore(this.name, type)
     }
 
