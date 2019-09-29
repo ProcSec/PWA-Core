@@ -64,6 +64,19 @@ export default class SettingsStorage {
         }
     }
 
+    static async delete(setting) {
+        try {
+            if (typeof setting !== "string") throw new Error("Incorrect key")
+
+            const db = this.db.OSTool(this.ObjectStoreNames[0])
+            await db.delete(setting)
+            return true
+        } catch (e) {
+            Report.write("Failed resetting settings", e)
+            return false
+        }
+    }
+
     static async set(setting, value) {
         try {
             if (typeof setting !== "string") throw new Error("Incorrect key")
@@ -131,6 +144,19 @@ export default class SettingsStorage {
         } catch (e) {
             Report.write("Failed getting all flags", e)
             return undefined
+        }
+    }
+
+    static async deleteFlag(setting) {
+        try {
+            if (typeof setting !== "string") throw new Error("Incorrect key")
+
+            const db = this.db.OSTool(this.ObjectStoreNames[1])
+            await db.delete(setting)
+            return true
+        } catch (e) {
+            Report.write("Failed resetting flag", e)
+            return false
         }
     }
 
