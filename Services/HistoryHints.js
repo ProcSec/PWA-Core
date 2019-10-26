@@ -32,7 +32,7 @@ export default class HistoryHints {
     }
 
     static async clearByName(name, percent = null) {
-        const os = this.connection.OSTool(name)
+        const os = (await this.connection.onReady()).OSTool(name)
         if (percent !== null) {
             await os.clearPercent(percent)
         } else {
@@ -42,13 +42,13 @@ export default class HistoryHints {
     }
 
     static async getHints(name) {
-        const os = this.connection.OSTool(name)
+        const os = (await this.connection.onReady()).OSTool(name)
         const r = (await os.getAll()).map(e => e.data).reverse()
         return r
     }
 
     static async saveHint(name, data) {
-        const os = this.connection.OSTool(name)
+        const os = (await this.connection.onReady()).OSTool(name)
         const currentConfig = HistoryHintsConfig.find(e => e.name === name)
 
         const dub = (await os.getByCount(currentConfig.max))

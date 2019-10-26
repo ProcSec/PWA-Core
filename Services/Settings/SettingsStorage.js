@@ -7,9 +7,8 @@ export default class SettingsStorage {
 
     static _dbConnection = null
 
-    static get db() {
-        if (this._dbConnection === null) return this._getDBConnection()
-        return this._dbConnection
+    static db() {
+        return this._getDBConnection().onReady()
     }
 
     static _getDBConnection() {
@@ -33,7 +32,7 @@ export default class SettingsStorage {
     static async get(setting, integrityCheck = false) {
         try {
             if (typeof setting !== "string") throw new Error("Incorrect key")
-            const db = this.db.OSTool(this.ObjectStoreNames[0])
+            const db = (await this.db()).OSTool(this.ObjectStoreNames[0])
             const res = await db.get(setting)
             if (res === undefined) {
                 let props = SettingsCheckProvider.get(setting, "user")
@@ -68,7 +67,7 @@ export default class SettingsStorage {
         try {
             if (typeof setting !== "string") throw new Error("Incorrect key")
 
-            const db = this.db.OSTool(this.ObjectStoreNames[0])
+            const db = (await this.db()).OSTool(this.ObjectStoreNames[0])
             await db.delete(setting)
             return true
         } catch (e) {
@@ -83,7 +82,7 @@ export default class SettingsStorage {
 
             const si = SettingsCheckProvider.check(setting, value, "user")
             const ov = await this.get(setting)
-            const db = this.db.OSTool(this.ObjectStoreNames[0])
+            const db = (await this.db()).OSTool(this.ObjectStoreNames[0])
             if (!si[0]) {
                 const res = await si[1](value, setting, async (v, ou = true) => {
                     await db.put({ key: setting, value: v })
@@ -105,7 +104,7 @@ export default class SettingsStorage {
     static async getFlag(flag, integrityCheck = false) {
         try {
             if (typeof flag !== "string") throw new Error("Incorrect key")
-            const db = this.db.OSTool(this.ObjectStoreNames[1])
+            const db = (await this.db()).OSTool(this.ObjectStoreNames[1])
             const res = (await db.get(flag))
             if (res === undefined) {
                 let props = SettingsCheckProvider.get(flag, "flags")
@@ -138,7 +137,7 @@ export default class SettingsStorage {
 
     static async getAllFlags() {
         try {
-            const db = this.db.OSTool(this.ObjectStoreNames[1])
+            const db = (await this.db()).OSTool(this.ObjectStoreNames[1])
             const res = await db.getAll()
             return res
         } catch (e) {
@@ -151,7 +150,7 @@ export default class SettingsStorage {
         try {
             if (typeof setting !== "string") throw new Error("Incorrect key")
 
-            const db = this.db.OSTool(this.ObjectStoreNames[1])
+            const db = (await this.db()).OSTool(this.ObjectStoreNames[1])
             await db.delete(setting)
             return true
         } catch (e) {
@@ -166,7 +165,7 @@ export default class SettingsStorage {
 
             const si = SettingsCheckProvider.check(flag, value, "flags")
             const ov = await this.getFlag(flag)
-            const db = this.db.OSTool(this.ObjectStoreNames[1])
+            const db = (await this.db()).OSTool(this.ObjectStoreNames[1])
             if (!si[0]) {
                 const res = await si[1](value, flag, async (v, ou = true) => {
                     await db.put({ key: flag, value: v })
@@ -189,7 +188,7 @@ export default class SettingsStorage {
         if (typeof type !== "string"
             || !this.ObjectStoreNames.includes(type)) throw new TypeError("Undefined section name")
 
-        const o = this.db.OSTool(type)
+        const o = (await this.db()).OSTool(type)
         const r = await o.clear()
         return r
     }

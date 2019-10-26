@@ -23,7 +23,7 @@ export default class SettingsGroup {
         new FieldsContainer([
             ["id", "dom", "options"],
             {
-                id: new FieldChecker({ type: "string", symbols: "a-zA-Z-" }),
+                id: new FieldChecker({ type: "string", symbols: "a-zA-Z0-9-" }),
                 display: new FieldChecker({ type: "function" }),
                 locked: new FieldChecker({ type: "function" }),
                 dom: new FieldChecker({ type: "function" }),

@@ -6,7 +6,16 @@ export default class DBTool {
 
     DBVersion = 0
 
-    DBConnection = null
+    _DBConnection = null
+
+    get DBConnection() {
+        if (this._DBConnection === null) throw new Error("DB is not ready yet")
+        return this._DBConnection
+    }
+
+    set DBConnection(s) {
+        this._DBConnection = s
+    }
 
     upgradeAgent = null
 
@@ -25,18 +34,40 @@ export default class DBTool {
         this.upgradeAgent = upgrade
         this.blockedAgent = blocked
         this.blockingAgent = blocking
+
+        let resolve
+        let reject
+
+        const waiter = new Promise((res, rej) => {
+            resolve = res
+            reject = rej
+        })
+
+        this._openWaiter = waiter
+
+        const self = this
+
+        this.openDB().then(() => resolve(self)).catch(reject)
     }
+
+    onReady() {
+        if (this._DBConnection !== null) return Promise.resolve(this)
+
+        return this._openWaiter
+    }
+
+    isReady = false
 
     delete() {
         return deleteDB(this.DBName)
     }
 
-    async getObjectStore(name, type = false) {
-        return (await this.getTransaction(name, type)).objectStore(name)
+    getObjectStore(name, type = false) {
+        return this.getTransaction(name, type).objectStore(name)
     }
 
     async getTablesList() {
-        return [...(await this.getConnection()).objectStoreNames]
+        return [...this.DBConnection.objectStoreNames]
     }
 
     async getDBSize() {
@@ -44,8 +75,8 @@ export default class DBTool {
             .reduce((collector, i) => collector + i, 0)
     }
 
-    async getConnection() {
-        if (this.DBConnection !== null) return this.DBConnection
+    getConnection() {
+        if (this.DBConnection !== null) return Promise.resolve(this.DBConnection)
 
         return this.openDB()
     }
@@ -59,11 +90,13 @@ export default class DBTool {
             })
 
         this.DBConnection = res
+        this.isReady = true
+
         return res
     }
 
-    async getTransaction(name, type = false) {
-        return (await this.getConnection())
+    getTransaction(name, type = false) {
+        return this.DBConnection
             .transaction(name, (type ? "readwrite" : "readonly"))
     }
 

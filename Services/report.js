@@ -8,7 +8,7 @@ export default class Report {
 
     static _dbConnectionInstance = null
 
-    static get DBConnection() {
+    static async DBConnection() {
         const self = this
 
         if (!this._dbConnectionInstance) {
@@ -24,12 +24,12 @@ export default class Report {
             })
         }
 
-        return this._dbConnectionInstance
+        return this._dbConnectionInstance.onReady()
     }
 
-    static get DBOS() {
+    static async DBOS() {
         if (this._dbOS) return this._dbOS
-        const db = this.DBConnection
+        const db = await this.DBConnection()
         this._dbOS = db.OSTool(this.StorageName)
         return this._dbOS
     }
@@ -87,7 +87,7 @@ export default class Report {
                 return (s !== undefined ? JSON.parse(s) : undefined)
             })
             if (log.length === 1) [log] = log
-            const os = this.DBOS
+            const os = await this.DBOS()
             const r = os.add({ log })
             return r
         } catch (e) {
@@ -97,7 +97,7 @@ export default class Report {
     }
 
     static async allLog() {
-        const os = this.DBOS
+        const os = await this.DBOS()
         const r = await os.getAll()
         return r
     }

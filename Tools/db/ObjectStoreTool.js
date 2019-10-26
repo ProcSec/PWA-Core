@@ -5,6 +5,7 @@ export default class ObjectStoreTool {
 
     constructor(connection, name) {
         if (typeof name !== "string") throw new TypeError("Incorrect ObjectStore name")
+        if (!connection.isReady) throw new Error("Connection subject must be ready")
 
         this.connection = connection
         this.name = name
@@ -12,10 +13,10 @@ export default class ObjectStoreTool {
         return new Proxy(this, {
             get(target, propKey) {
                 if (!(propKey in target)) {
-                    return async (...params) => {
-                        const os = await target.getOS(true)
-                        return os[propKey](...params)
-                    }
+                    const os = target.getOS(true)
+                    const r = os[propKey]
+                    if (typeof r === "function") return r.bind(os)
+                    return r
                 }
                 return target[propKey]
             },
@@ -31,7 +32,7 @@ export default class ObjectStoreTool {
     }
 
     async getAll() {
-        const os = await this.getOS()
+        const os = this.getOS()
         if ("getAll" in os) return os.getAll()
 
         return this.getByCount()
@@ -46,7 +47,7 @@ export default class ObjectStoreTool {
         self.size = 0
         return new Promise((resolve, reject) => {
             this.getOS()
-                .then(os => os.openCursor())
+                .openCursor()
                 .then(
                     function iter(cursor) {
                         if (!cursor) return resolve(self.size)
@@ -107,7 +108,7 @@ export default class ObjectStoreTool {
     }
 
     async createCursor(range = null, direction = "next", type = false) {
-        return (await this.getOS(type))
+        return this.getOS(type)
             .openCursor(this.constructor.generateIDBRange(range), direction)
     }
 
