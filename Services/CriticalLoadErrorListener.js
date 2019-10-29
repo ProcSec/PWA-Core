@@ -13,11 +13,12 @@ export default class CriticalLoadErrorListener {
 
         let error
         if (typeof e === "object") {
-            const filename = e.filename || "[unknown file]"
-            const lineno = e.lineno || "?"
-            const colno = e.colno || "??"
+            const filename = e.fileName || e.filename || "[unknown file]"
+            const lineno = e.lineNumber || e.lineno || "?"
+            const colno = e.columnNumber || e.colno || "??"
+            const stack = e.stack || false
 
-            error = (e.message ? `${e.message} on ${filename}:${lineno}:${colno}` : "No debug info available")
+            error = (e.message ? `${e.message} on ${filename}:${lineno}:${colno} \n${stack}` : "No debug info available")
         } else error = String(e)
         const ua = window.navigator.userAgent
 
