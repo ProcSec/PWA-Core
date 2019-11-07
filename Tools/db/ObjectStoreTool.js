@@ -31,6 +31,16 @@ export default class ObjectStoreTool {
         return this.name
     }
 
+    async create(params = {}) {
+        await this.connection.onReady()
+        return this.connection.DBConnection.createObjectStore(this.name, params)
+    }
+
+    async destroy(params = {}) {
+        await this.connection.onReady()
+        return this.connection.DBConnection.deleteObjectStore(this.name, params)
+    }
+
     async getAll() {
         const os = this.getOS()
         if ("getAll" in os) return os.getAll()

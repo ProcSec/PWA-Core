@@ -1,4 +1,5 @@
 import { openDB, deleteDB } from "idb"
+import Report from "@Core/Services/report"
 import ObjectStoreTool from "./ObjectStoreTool"
 
 export default class DBTool {
@@ -32,8 +33,14 @@ export default class DBTool {
         this.DBName = db
         this.DBVersion = version
         this.upgradeAgent = upgrade
-        this.blockedAgent = blocked
-        this.blockingAgent = blocking
+        this.blockedAgent = (...e) => {
+            Report.write("IDB Open blocked", e)
+            blocked(e)
+        }
+        this.blockingAgent = (...e) => {
+            Report.write("IDB Open is being blocked", e)
+            blocking(e)
+        }
 
         let resolve
         let reject
@@ -58,6 +65,10 @@ export default class DBTool {
 
     isReady = false
 
+    get request() {
+        return this.DBConnection
+    }
+
     delete() {
         return deleteDB(this.DBName)
     }
@@ -67,6 +78,7 @@ export default class DBTool {
     }
 
     async getTablesList() {
+        await this.onReady()
         return [...this.DBConnection.objectStoreNames]
     }
 
