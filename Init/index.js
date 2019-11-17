@@ -1,3 +1,4 @@
+import "./errorListener"
 import "@App/loaders/Presets"
 import "@App/debug/recovery"
 
