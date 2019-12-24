@@ -75,7 +75,7 @@ class CoreLoader {
 
         try {
             if (task.async) res = await this._asyncRunner(task)
-            res = await this._queueRunnerRecursive(task)
+            else res = await this._queueRunnerRecursive(task)
         } catch (e) {
             res = e
         }
