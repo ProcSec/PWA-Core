@@ -1,3 +1,5 @@
+import delayAction from "@Core/Tools/objects/delayAction"
+import PWA from "@App/modules/main/PWA"
 import Report from "./report"
 import SettingsStorage from "./Settings/SettingsStorage"
 
@@ -97,6 +99,15 @@ export default class SW {
 
     static async onUpdate() {
         this.updatePending = true
+
+        if (PWA.analyticsAllowed) {
+            delayAction(() => {
+                window.gtag("event", "update_recieved", {
+                    event_category: "app",
+                    non_interaction: true,
+                })
+            })
+        }
 
         const gottaDelay = await SettingsStorage.get("user_update_prompt_later")
         if (gottaDelay) {

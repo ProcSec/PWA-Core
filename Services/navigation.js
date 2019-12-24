@@ -14,6 +14,10 @@ export default class Navigation {
 
     static fallbackSplitter = "/"
 
+    static resetTitle = false
+
+    static titleFallback = "App"
+
     static modulesRegister = []
 
     static get url() {
@@ -33,11 +37,15 @@ export default class Navigation {
                 {
                     module: new FieldChecker({ type: "string" }),
                     params: new FieldChecker({ type: "object" }),
+                    title: new FieldChecker({ type: "string" }),
                 },
             ]).set(url)
             url.params = url.params || {}
             const stringURL = `${this.prefix}${url.module}${(Object.keys(url.params).length > 0 ? `${this.paramsDelimeter}${this.paramsGenerator(url.params)}` : "")}`
+
+            if (url.title || this.resetTitle) this.updateTitle(url.title || this.titleFallback)
             this.url = stringURL
+
             return stringURL
         }
         window.history.pushState({ pointer: ++this.pointer, session: CoreLoader.sessionID }, "", url)
@@ -63,6 +71,10 @@ export default class Navigation {
         if (typeof set !== "object") throw new Error("Incorrect Current set")
 
         this.historyCurrent[this.historyCurrent.length - 1] = set
+    }
+
+    static updateTitle(title) {
+        window.document.title = String(title)
     }
 
     static paramsParser(params = "") {

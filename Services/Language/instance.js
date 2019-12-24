@@ -1,3 +1,4 @@
+/* global __PACKAGE_DOWNLOADABLE_LANG_PACKS */
 import FieldsContainer from "@Core/Tools/validation/fieldsContainer"
 import FieldChecker from "@Core/Tools/validation/fieldChecker"
 import LanguageCore from "./core"
@@ -31,7 +32,10 @@ export default class Language {
 
     async loadData() {
         try {
-            const { strings, library } = await import(`@Resources/language/${this.info.dir}`)
+            const { strings, library } = (
+                __PACKAGE_DOWNLOADABLE_LANG_PACKS
+                    ? await import(`@Resources/language/${this.info.dir}`)
+                    : require(`@Resources/language/${this.info.dir}`))
             new FieldsContainer([
                 ["strings", "library"],
                 {
