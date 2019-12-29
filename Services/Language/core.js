@@ -26,7 +26,7 @@ export default class LanguageCore {
         if (this.isSupported(ul)) return ul
 
         if (navigator.languages) {
-            const lang = navigator.languages.find(e => this.isSupported(e.slice(0, 2)))
+            const lang = navigator.languages.find((e) => this.isSupported(e.slice(0, 2)))
             return (lang ? lang.slice(0, 2) : this.fallbackDefault)
         }
         if (navigator.language) {
@@ -40,7 +40,7 @@ export default class LanguageCore {
     }
 
     static isSupported(code) {
-        return this.languageList.find(e => e.code === code) !== undefined
+        return this.languageList.find((e) => e.code === code) !== undefined
     }
 
     static async autoLoad() {

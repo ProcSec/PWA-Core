@@ -84,7 +84,7 @@ export default class Navigation {
             return JSON.parse(`{"${params.replace(/&/g, "\",\"").replace(/=/g, "\":\"")}"}`,
                 (key, value) => (key === "" ? value : decodeURIComponent(value)))
         } catch (e) {
-            return params.split(this.fallbackSplitter).map(el => decodeURIComponent(el))
+            return params.split(this.fallbackSplitter).map((el) => decodeURIComponent(el))
         }
     }
 
@@ -92,7 +92,7 @@ export default class Navigation {
         if (typeof params !== "object") return ""
 
         if (Array.isArray(params)) {
-            return params.map(e => encodeURIComponent(e)).join(this.fallbackSplitter)
+            return params.map((e) => encodeURIComponent(e)).join(this.fallbackSplitter)
         }
         return Object.entries(params).map(([key, val]) => `${encodeURIComponent(key)}=${encodeURIComponent(val.toString())}`).join("&")
     }
@@ -146,7 +146,7 @@ export default class Navigation {
 
     parsedCallback(nav) {
         // Callback and Nav
-        const listeners = this.modulesRegister.filter(e => e.name === module)
+        const listeners = this.modulesRegister.filter((e) => e.name === module)
         listeners.forEach((e) => {
             e.callback(nav)
             if (e.id !== "") Nav.highlight(e, nav)
@@ -208,7 +208,7 @@ export default class Navigation {
     }
 
     static go(module, params, manual) {
-        const callbacks = this.modulesRegister.filter(e => e.id === module)
+        const callbacks = this.modulesRegister.filter((e) => e.id === module)
 
         if (!(callbacks.length > 0)) {
             if (manual !== undefined) this.InitNavigationError()

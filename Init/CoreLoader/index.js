@@ -190,7 +190,7 @@ class CoreLoader {
 
     static _emitTaskDone(id) {
         try {
-            this._doneListeners.forEach(el => el(this.taskInfo(id)))
+            this._doneListeners.forEach((el) => el(this.taskInfo(id)))
         } catch (e) {
             // No errors
         }

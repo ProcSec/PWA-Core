@@ -19,8 +19,8 @@ export default class DBUserPresence {
                     {
                         changeable: new FieldChecker({ type: "boolean" }),
                         display: new FieldChecker({ type: "boolean" }),
-                        min: new FieldChecker({ type: "number", checker: [q => q >= 0] }),
-                        max: new FieldChecker({ type: "number", checker: [q => q >= 0] }),
+                        min: new FieldChecker({ type: "number", checker: [(q) => q >= 0] }),
+                        max: new FieldChecker({ type: "number", checker: [(q) => q >= 0] }),
                     },
                 ]),
                 actions: new FieldsContainer([
@@ -55,7 +55,7 @@ export default class DBUserPresence {
 
         (async () => {
             if ("quota" in data && await data.size() > await data.quota()) {
-                const autoClean = data.functions.find(e => e.name === "auto-clean")
+                const autoClean = data.functions.find((e) => e.name === "auto-clean")
                 if (autoClean) autoClean.handler()
             }
         })()
@@ -66,6 +66,6 @@ export default class DBUserPresence {
     }
 
     static get(id) {
-        return this._register.find(e => e.id === id)
+        return this._register.find((e) => e.id === id)
     }
 }

@@ -37,7 +37,7 @@ export default class Report {
 
     static trace() {
         let stack = new Error().stack || ""
-        stack = stack.split("\n").map(line => line.trim())
+        stack = stack.split("\n").map((line) => line.trim())
         return stack.splice(stack[0] === "Error" ? 2 : 1)
     }
 
@@ -57,7 +57,7 @@ export default class Report {
     static writeNoTrace(...log) {
         OutputRecovery(...log)
         this.saveToDB(
-            ...log.map(re => (re instanceof Error ? errorToObject(re) : re)),
+            ...log.map((re) => (re instanceof Error ? errorToObject(re) : re)),
         )
         if (App.debug) {
             console.log(...log)
@@ -67,7 +67,7 @@ export default class Report {
     static warn(...log) {
         OutputRecovery(...log)
         this.saveToDB(
-            ...log.map(re => (re instanceof Error ? errorToObject(re) : re)),
+            ...log.map((re) => (re instanceof Error ? errorToObject(re) : re)),
         )
         console.warn(...log)
     }
@@ -75,7 +75,7 @@ export default class Report {
     static error(...log) {
         OutputRecovery(...log)
         this.saveToDB(
-            ...log.map(re => (re instanceof Error ? errorToObject(re) : re)),
+            ...log.map((re) => (re instanceof Error ? errorToObject(re) : re)),
         )
         console.error(...log)
     }

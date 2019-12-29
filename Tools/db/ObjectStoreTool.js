@@ -129,7 +129,7 @@ export default class ObjectStoreTool {
 
             function iter(cursor) {
                 if (!cursor) return resolve(result)
-                if (conditions.every(func => func(cursor.value))) result.push(cursor.value)
+                if (conditions.every((func) => func(cursor.value))) result.push(cursor.value)
 
                 return cursor.continue().then(iter)
             }
@@ -138,15 +138,15 @@ export default class ObjectStoreTool {
     }
 
     getWhereOr(cursorInstance = null, ...conditions) {
-        return this.getWhere(cursorInstance, value => conditions.some(func => func(value)))
+        return this.getWhere(cursorInstance, (value) => conditions.some((func) => func(value)))
     }
 
     getWhereCombine(cursorInstance = null, and = [], or = []) {
         return this.getWhere(cursorInstance, (value) => {
             let a = true
             let o = true
-            if (and.length > 0) a = and.every(func => func(value))
-            if (or.length > 0 && a) o = or.some(func => func(value))
+            if (and.length > 0) a = and.every((func) => func(value))
+            if (or.length > 0 && a) o = or.some((func) => func(value))
             return a && o
         })
     }

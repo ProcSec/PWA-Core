@@ -1,5 +1,5 @@
 export default function insert(a, i, { type = "insert", target, field = "id" }) {
-    const ind = a.indexOf(el => el[field] === target)
+    const ind = a.indexOf((el) => el[field] === target)
     if (type === "insert") {
         a.push(i)
     } else if (type === "replace") {

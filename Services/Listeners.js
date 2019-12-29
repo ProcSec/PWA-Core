@@ -18,7 +18,7 @@ export default class Listeners {
             })
         }
 
-        if (record.filter(a => a).length === 0) {
+        if (record.filter((a) => a).length === 0) {
             element.addEventListener(name, listener, options)
         }
 
@@ -37,7 +37,7 @@ export default class Listeners {
         if (number in record) {
             delete record[number]
 
-            if (record.filter(a => a).length === 0) {
+            if (record.filter((a) => a).length === 0) {
                 element.removeEventListener(name, listener, options)
             }
             return true

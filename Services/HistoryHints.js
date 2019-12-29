@@ -26,7 +26,7 @@ export default class HistoryHints {
     })
 
     static async clear(auto) {
-        const tasks = HistoryHintsConfig.map(e => this.clearByName(e.name, (auto ? 0.5 : null)))
+        const tasks = HistoryHintsConfig.map((e) => this.clearByName(e.name, (auto ? 0.5 : null)))
         const r = await Promise.all(tasks)
         return r
     }
@@ -43,16 +43,16 @@ export default class HistoryHints {
 
     static async getHints(name) {
         const os = (await this.connection.onReady()).OSTool(name)
-        const r = (await os.getAll()).map(e => e.data).reverse()
+        const r = (await os.getAll()).map((e) => e.data).reverse()
         return r
     }
 
     static async saveHint(name, data) {
         const os = (await this.connection.onReady()).OSTool(name)
-        const currentConfig = HistoryHintsConfig.find(e => e.name === name)
+        const currentConfig = HistoryHintsConfig.find((e) => e.name === name)
 
         const dub = (await os.getByCount(currentConfig.max))
-            .find(e => e.data === data)
+            .find((e) => e.data === data)
         if (dub) os.delete(dub.key)
 
         os.add({ data })

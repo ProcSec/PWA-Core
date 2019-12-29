@@ -13,7 +13,7 @@ export default class Language {
     constructor(code) {
         let l
         try {
-            l = LanguageCore.languageList.find(e => e.code === code)
+            l = LanguageCore.languageList.find((e) => e.code === code)
             new FieldsContainer([
                 ["code", "name", "dir", "author"],
                 {

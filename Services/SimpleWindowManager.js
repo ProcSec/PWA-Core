@@ -199,7 +199,7 @@ export default class WindowManager {
     static generateWindow(e) {
         return ({
             element: e,
-            append: p => e.render(p),
+            append: (p) => e.render(p),
             clear: () => { e.clear() },
             replace: (p) => { e.clear(p) },
         })
@@ -209,7 +209,7 @@ export default class WindowManager {
         e = e || [undefined, {}]
         return ({
             element: e[0],
-            append: p => e[0].render(p),
+            append: (p) => e[0].render(p),
             clear: () => { e[0].clear() },
             replace: (p) => { e[0].clear(p) },
             options: e[1],
@@ -268,7 +268,7 @@ export default class WindowManager {
         e = e || undefined
         return ({
             element: e,
-            append: p => e.render(p),
+            append: (p) => e.render(p),
             clear: () => { e.clear() },
             replace: (p) => { e.clear(p) },
             pop: () => {

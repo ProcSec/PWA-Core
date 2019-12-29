@@ -126,7 +126,7 @@ export default class Design {
         const match = hex.match(RegExp("#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})", "i"))
         if (!match) return this.parseRgba(hex)
         const [r, g, b] = match
-            .slice(1).map(n => parseInt(n, 16))
+            .slice(1).map((n) => parseInt(n, 16))
 
         return [r, g, b]
     }

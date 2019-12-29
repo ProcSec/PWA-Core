@@ -45,15 +45,15 @@ export default class TransformatorsRegistry {
     }
 
     static getOfType(type) {
-        return Array.from(this._registry).filter(e => e.type === type)
+        return Array.from(this._registry).filter((e) => e.type === type)
     }
 
     static getOfTypeInstances(type) {
-        return Array.from(this._instances.values()).filter(e => e.constructor.type === type)
+        return Array.from(this._instances.values()).filter((e) => e.constructor.type === type)
     }
 
     static getByID(id) {
-        return Array.from(this._registry).find(e => e.id === id)
+        return Array.from(this._registry).find((e) => e.id === id)
     }
 
     static getByIDInstance(id) {
