@@ -6,6 +6,11 @@ export default class LoadState {
     }
 
     static set is(a) {
-        if (a === true) this._state = true
+        if (a === true) {
+            this._state = true
+            this.ondone()
+        }
     }
+
+    static ondone() {}
 }
