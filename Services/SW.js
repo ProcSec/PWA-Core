@@ -41,12 +41,20 @@ export default class SW {
     }
 
     static success(registration, callback) {
+        this.registration = registration
+        this.SWWaiters.reduce((p, func) => p.then(async () => {
+            try {
+                await func(registration)
+            } catch (e) {
+                // Observe error
+            }
+        }), Promise.resolve())
+
         SW.plannedPromptCheck()
 
         if (!navigator.serviceWorker.controller) {
             return
         }
-        this.registration = registration
 
         let preventDevToolsReloadLoop
         navigator.serviceWorker.addEventListener("controllerchange", (event) => {
@@ -124,5 +132,11 @@ export default class SW {
             SettingsStorage.set("update_prompt_planned", false)
             this.userPrompt(true)
         }
+    }
+
+    static SWWaiters = []
+
+    static onSW(func) {
+        this.SWWaiters.push(func)
     }
 }

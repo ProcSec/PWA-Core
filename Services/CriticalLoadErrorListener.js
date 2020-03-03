@@ -46,3 +46,10 @@ window.addEventListener("error", (e) => {
     if (!document.body) window.addEventListener("load", () => CriticalLoadErrorListener.listener(e))
     else CriticalLoadErrorListener.listener(e)
 })
+
+window.addEventListener("unhandledrejection", (e) => {
+    if (LoadState.is === true) return
+
+    if (!document.body) window.addEventListener("load", () => CriticalLoadErrorListener.listener(e.reason))
+    else CriticalLoadErrorListener.listener(e.reason)
+})

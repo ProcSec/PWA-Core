@@ -3,6 +3,7 @@
 import urlBase64ToUint8Array from "@Core/Tools/transformation/text/urlBase64ToUnit8Array"
 import Report from "./report"
 import SW from "./SW"
+import NotificationManager from "./Push/NotificationManager"
 
 export default class Push {
     static requestPermission() {
@@ -37,24 +38,49 @@ export default class Push {
     }
 
     static async listSources() {
-        return [
-            {
-                on: true,
-                icon: "settings_application",
-                sign: "Test Subscription",
-                description: "This one tests a notification source",
-                subscription: { type: "test", id: "test" },
-            },
-            {
-                on: false,
-                sign: "Test Subscription 2",
-                description: "This one tests a 2nd notification source",
-                subscription: { type: "test", id: "test2" },
-            },
-        ]
+        if (!NotificationManager.activeChecked) {
+            await new Promise((resolve) => {
+                NotificationManager.onActiveCheck.push(resolve)
+            })
+        }
+
+        if (!NotificationManager.service) {
+            if (NotificationManager.services.size === 1) {
+                NotificationManager.active = Array.from(NotificationManager.services.values())[0].id
+            }
+        }
+
+        try {
+            const list = await NotificationManager.service.getList(
+                ...(NotificationManager.subscription ? [NotificationManager.subscription] : []
+                ),
+            )
+            return Promise.all(
+                list.map(async (item) => (
+                    {
+                        on: item.state,
+                        icon: item.descriptor.icon,
+                        sign: await item.descriptor.sign(),
+                        description: await item.descriptor.description(),
+                        subscription: { type: item.type, id: item.id },
+                        channel: item,
+                    }
+                )),
+            )
+        } catch (e) {
+            // Handle error if not set
+        }
+
+        return []
     }
 
-    static async configure({ type, id, ...other }, status) {
-        return true
+    static async configure(channel, status, el) {
+        status = !!status
+
+        if (status) {
+            await NotificationManager.subscribe(channel)
+        } else {
+            await NotificationManager.unsubscribe(channel)
+        }
     }
 }
