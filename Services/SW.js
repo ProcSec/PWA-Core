@@ -27,46 +27,53 @@ export default class SW {
     }
 
     static register() {
-        if ("serviceWorker" in navigator) {
+        const self = this
+        return new Promise((resolve, reject) => {
+            if (!("serviceWorker" in navigator)) reject(new Error("ServiceWorker is not supported"))
             try {
                 navigator.serviceWorker.register("/sw.js", { scope: "/" })
-                    .then((e) => this.success(e))
-                    .catch((e) => this.fail(e))
+                    .then((e) => self.success(e, [resolve, reject]))
+                    .catch((e) => self.fail(e, [resolve, reject]))
             } catch (e) {
-                return false
+                reject(e)
             }
-            return true
-        }
-        return false
+            resolve()
+        })
     }
 
-    static success(registration, callback) {
-        this.registration = registration
-        this.SWWaiters.reduce((p, func) => p.then(async () => {
-            try {
-                await func(registration)
-            } catch (e) {
-                // Observe error
+    static success(registration, [resolve, reject]) {
+        try {
+            this.registration = registration
+            this.SWWaiters.reduce((p, func) => p.then(async () => {
+                try {
+                    await func(registration)
+                } catch (e) {
+                    // Observe error
+                }
+            }), Promise.resolve())
+
+            SW.plannedPromptCheck()
+
+            resolve()
+
+            if (!navigator.serviceWorker.controller) {
+                return
             }
-        }), Promise.resolve())
 
-        SW.plannedPromptCheck()
+            let preventDevToolsReloadLoop
+            navigator.serviceWorker.addEventListener("controllerchange", (event) => {
+                if (preventDevToolsReloadLoop) return
+                preventDevToolsReloadLoop = true
+                Report.write("Ready to reload")
+                SW.onUpdate()
+            })
 
-        if (!navigator.serviceWorker.controller) {
-            return
+            SW.newOne(registration, () => {
+                SW.newSWEvent(registration)
+            })
+        } catch (e) {
+            reject(e)
         }
-
-        let preventDevToolsReloadLoop
-        navigator.serviceWorker.addEventListener("controllerchange", (event) => {
-            if (preventDevToolsReloadLoop) return
-            preventDevToolsReloadLoop = true
-            Report.write("Ready to reload")
-            SW.onUpdate()
-        })
-
-        SW.newOne(registration, () => {
-            SW.newSWEvent(registration)
-        })
     }
 
     static newOne(registration, callback) {
@@ -101,8 +108,9 @@ export default class SW {
         registration.waiting.postMessage("skipWaiting")
     }
 
-    static fail(error) {
+    static fail(error, [resolve, reject]) {
         Report.write("SW Error", error)
+        reject(error)
     }
 
     static async onUpdate() {

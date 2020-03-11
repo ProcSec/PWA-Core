@@ -1,3 +1,4 @@
+import SplashScreenController from "@Environment/Loaders/SplashScreenController"
 import LoadState from "./LoadState"
 
 
@@ -10,6 +11,12 @@ export default class CriticalLoadErrorListener {
         }
 
         if (consoleIt) console.error(e)
+
+        try {
+            SplashScreenController.splashElement.remove()
+        } catch (er) {
+            // Handle error
+        }
 
         let error
         if (typeof e === "object") {

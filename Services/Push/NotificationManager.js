@@ -1,4 +1,6 @@
 import urlBase64ToUint8Array from "@Core/Tools/transformation/text/urlBase64ToUnit8Array"
+import Auth from "@App/modules/mono/services/Auth"
+import MonoNotificationClusterController from "@App/modules/mono/services/Push/MonoNotificationClusterController"
 import NotificationService from "./NotificationService"
 import SW from "../SW"
 import Report from "../report"
@@ -13,7 +15,7 @@ export default class NotificationManager {
     static _activeChecked = false
 
     static get activeChecked() {
-        if (this.services.size === 0) return true
+        if (this.services.size === 0 || Auth.inited) return true
         return this._activeChecked
     }
 
@@ -21,42 +23,52 @@ export default class NotificationManager {
         return this.services.get(this.active) || null
     }
 
-    static onActiveCheck = []
+    static reset() {
+        MonoNotificationClusterController.list = {}
+        this.active = null
+        this._activeChecked = null
+        this.subscription = null
+        this.services.clear()
+    }
 
-    static async register(service, endpoint = null) {
-        if (!(service instanceof NotificationService)) throw new TypeError("Incorrect Service")
-        this.services.set(service.id, service)
-
-        if (endpoint === null) {
-            this._activeChecked = true
-            return
-        }
-        const activeCheck = async () => {
-            if (SW.registration === false || !("pushManager" in SW.registration)) throw new Error("Push Service Worker is not activated")
-
-            const sub = await SW.registration.pushManager.getSubscription()
-            if (sub === null) return
-
-            if (endpoint === sub.endpoint) {
-                this.active = service.id
-                this.subscription = sub
+    static register(service, endpoint = null) {
+        return new Promise(async (resolve, reject) => {
+            if (!(service instanceof NotificationService)) {
+                reject(new TypeError("Incorrect Service"))
+                return
             }
+            this.services.set(service.id, service)
 
-            this._activeChecked = true
-
-            this.onActiveCheck.forEach((func) => {
-                try {
-                    func(sub)
-                } catch (e) {
-                    // Surpressing errors
+            if (endpoint === null) {
+                this._activeChecked = true
+                resolve()
+                return
+            }
+            const activeCheck = async () => {
+                if (SW.registration === false || !("pushManager" in SW.registration)) {
+                    reject(new Error("Push Service Worker is not activated"))
+                    return
                 }
-            })
-        }
-        if (SW.registration) {
-            await activeCheck()
-            return
-        }
-        SW.onSW(activeCheck)
+                const sub = await SW.registration.pushManager.getSubscription()
+                if (sub === null) {
+                    resolve()
+                    return
+                }
+                if (endpoint === sub.endpoint) {
+                    this.active = service.id
+                    this.subscription = sub
+                }
+
+                this._activeChecked = true
+                resolve()
+            }
+            if (SW.registration) {
+                await activeCheck()
+                resolve()
+                return
+            }
+            SW.onSW(activeCheck)
+        })
     }
 
     static async destroy(service) {

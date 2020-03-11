@@ -22,5 +22,7 @@ export default class NotificationService {
 
     activated(subscription) { }
 
-    setState(list = [], state = 1) { }
+    subscribe(channel, subscription) { }
+
+    unsubscribe(channel, subscription) { }
 }

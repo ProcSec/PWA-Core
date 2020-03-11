@@ -1,18 +1,11 @@
 import DBTool from "@Core/Tools/db/DBTool"
 
+// TODO: Export config
 const HistoryHintsConfig = [
-    {
-        name: "subjects",
-        max: 10,
-    },
-    {
-        name: "lesson-locations",
-        max: 10,
-    },
 ]
 
 export default class HistoryHints {
-    static connection = new DBTool("userActvityHistory", 1, {
+    static connection = new DBTool("userActivityHistory", 1, {
         upgrade(db, oldVersion, newVersion, transaction) {
             if (oldVersion === 0) {
                 HistoryHintsConfig.forEach((e) => {

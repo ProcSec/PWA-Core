@@ -53,6 +53,11 @@ export default class Navigation {
         return this.parseURL(url)
     }
 
+    static reload() {
+        // eslint-disable-next-line no-self-assign
+        this.url = this.url
+    }
+
     static history = []
 
     static historyCurrent = [Object.create(null)]

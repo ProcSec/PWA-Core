@@ -4,10 +4,14 @@ import SW from "@Core/Services/SW"
 CoreLoader.registerTask({
     id: "sw-register",
     presence: "Service Worker registration",
-    task() {
-        const res = SW.register()
-        if (res) return new CoreLoaderResult()
-        return new CoreLoaderWarning("Navigator does not support Service Workers")
+    async task() {
+        try {
+            await SW.register()
+        } catch (e) {
+            throw new CoreLoaderWarning("Registration failed", e)
+        }
+
+        return new CoreLoaderResult()
     },
     alwaysResolve: true,
 })
