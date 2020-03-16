@@ -25,7 +25,7 @@ export default class DBTool {
     constructor(db, version,
         { upgrade = () => { }, blocked = () => { }, blocking = () => { } } = {}) {
         if (typeof db !== "string"
-            || typeof version !== "number"
+            || (typeof version !== "number" && version !== null)
             || typeof upgrade !== "function"
             || typeof blocked !== "function"
             || typeof blocking !== "function") throw new Error("Incorrect DB params")
@@ -33,12 +33,14 @@ export default class DBTool {
         this.DBName = db
         this.DBVersion = version
         this.upgradeAgent = upgrade
+        const self = this
         this.blockedAgent = (...e) => {
-            Report.write("IDB Open blocked", e)
+            Report.write("IDB Open blocked. Unblocking...", e)
             blocked(e)
+            self.DBConnection.close()
         }
         this.blockingAgent = (...e) => {
-            Report.write("IDB Open is being blocked", e)
+            Report.write("IDB Open is being blocked.", e)
             blocking(e)
         }
 
@@ -51,8 +53,6 @@ export default class DBTool {
         })
 
         this._openWaiter = waiter
-
-        const self = this
 
         this.openDB().then(() => resolve(self)).catch(reject)
     }
@@ -94,12 +94,16 @@ export default class DBTool {
     }
 
     async openDB() {
-        const res = await openDB(this.DBName, this.DBVersion,
-            {
-                upgrade: this.upgradeAgent,
-                blocked: this.blockedAgent,
-                blocking: this.blockingAgent,
-            })
+        const res = (
+            this.DBVersion
+                ? await openDB(this.DBName, this.DBVersion,
+                    {
+                        upgrade: this.upgradeAgent,
+                        blocked: this.blockedAgent,
+                        blocking: this.blockingAgent,
+                    })
+                : await openDB(this.DBName)
+        )
 
         this.DBConnection = res
         this.isReady = true
