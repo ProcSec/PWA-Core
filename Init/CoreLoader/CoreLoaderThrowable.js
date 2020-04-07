@@ -1,15 +1,15 @@
 import FieldChecker from "@Core/Tools/validation/fieldChecker"
 
 export default class CoreLoaderThrowable {
-    _explanation = null
+    #explanation = null
 
-    _data = null
+    #data = null
 
     constructor(explanation, data = null) {
         new FieldChecker({ type: "string" }).set(explanation)
 
-        this._explanation = explanation
-        this._data = data
+        this.#explanation = explanation
+        this.#data = data
     }
 
     get info() {
@@ -19,7 +19,7 @@ export default class CoreLoaderThrowable {
         }
     }
 
-    get explanation() { return this._explanation }
+    get explanation() { return this.#explanation }
 
-    get data() { return this._data }
+    get data() { return this.#data }
 }

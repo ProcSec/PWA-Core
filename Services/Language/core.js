@@ -5,7 +5,7 @@ import SettingsStorage from "../Settings/SettingsStorage"
 import Language from "./instance"
 
 export default class LanguageCore {
-    static _language = false
+    static #language = false
 
     static fallbackDefault = "en"
 
@@ -15,9 +15,9 @@ export default class LanguageCore {
 
     static get language() {
         return {
-            strings: this._language.strings,
-            library: this._language.library,
-            info: this._language.info,
+            strings: this.#language.strings,
+            library: this.#language.library,
+            info: this.#language.info,
         }
     }
 
@@ -67,7 +67,7 @@ export default class LanguageCore {
             throw new Error("Invalid language package or an error during loading")
         }
 
-        this._language = lang
+        this.#language = lang
         document.documentElement.setAttribute("lang", lang.info.code)
 
         return true

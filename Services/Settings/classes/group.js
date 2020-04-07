@@ -5,11 +5,11 @@ import insert from "@Core/Tools/transformation/object/arrayInsert"
 import { SettingsSection, SettingsItem } from "."
 
 export default class SettingsGroup {
-    _data = {}
+    #data = {}
 
-    _parent = false
+    #parent = false
 
-    _children = []
+    #children = []
 
     generatedInstance = false
 
@@ -17,8 +17,8 @@ export default class SettingsGroup {
         if (!(parent instanceof SettingsSection)) throw new TypeError("Only Settings Section can be a parrent")
         if (!(Array.isArray(children))) throw new TypeError("Children must be array")
 
-        this._parent = parent
-        this._children = children
+        this.#parent = parent
+        this.#children = children
 
         new FieldsContainer([
             ["id", "dom", "options"],
@@ -38,47 +38,47 @@ export default class SettingsGroup {
             },
         ]).set(data)
 
-        this._data = data
+        this.#data = data
     }
 
     get id() {
-        return this._data.id
+        return this.#data.id
     }
 
     get onupdate() {
         return (e) => {
-            this._parent.onupdate()
-            if (typeof this._data.events.onupdate === "function") return this._data.events.onupdate()
+            this.#parent.onupdate()
+            if (typeof this.#data.events.onupdate === "function") return this.#data.events.onupdate()
             return true
         }
     }
 
     get onfail() {
         return (e) => {
-            this._parent.onfail()
-            if (typeof this._data.events.onfail === "function") return this._data.events.onfail()
+            this.#parent.onfail()
+            if (typeof this.#data.events.onfail === "function") return this.#data.events.onfail()
             return true
         }
     }
 
     get parent() {
-        return this._parent
+        return this.#parent
     }
 
     get children() {
-        return this._children
+        return this.#children
     }
 
     get layout() {
-        return this._parent.layout
+        return this.#parent.layout
     }
 
     async render() {
-        if ("display" in this._data && !(await this._data.display())) {
+        if ("display" in this.#data && !(await this.#data.display())) {
             return false
         }
         // eslint-disable-next-line new-cap
-        this.generatedInstance = await new this._data.dom(this._data.options, Navigation.parse)
+        this.generatedInstance = await new this.#data.dom(this.#data.options, Navigation.parse)
         const pr = await Promise.all(this.children.map(async (e) => {
             const rm = await e.object.render()
             return rm
@@ -103,7 +103,7 @@ export default class SettingsGroup {
         const insertion = {
             object: save,
         }
-        this._children = insert(this._children, insertion, r)
+        this.#children = insert(this.#children, insertion, r)
         this.layout.mapRegister(id, save)
         return this
     }

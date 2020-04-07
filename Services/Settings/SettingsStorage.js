@@ -1,19 +1,19 @@
 import DBTool from "../../Tools/db/DBTool"
 import SettingsCheckProvider from "./SettingsCheckProvider"
-import Report from "../report"
+import Report from "../reportOld"
 
 export default class SettingsStorage {
     static ObjectStoreNames = ["user", "flags"]
 
-    static _dbConnection = null
+    static #dbConnection = null
 
     static db() {
-        return this._getDBConnection().onReady()
+        return this.getDBConnection().onReady()
     }
 
-    static _getDBConnection() {
+    static getDBConnection() {
         const self = this
-        this._dbConnection = new DBTool("SettingsStorage", 1, {
+        this.#dbConnection = new DBTool("SettingsStorage", 1, {
             upgrade(db, oldVersion, newVersion, transaction) {
                 if (oldVersion === 0) {
                     db.createObjectStore(self.ObjectStoreNames[0], {
@@ -26,7 +26,7 @@ export default class SettingsStorage {
             },
         })
 
-        return this._dbConnection
+        return this.#dbConnection
     }
 
     static async get(setting, integrityCheck = false) {

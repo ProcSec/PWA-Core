@@ -2,21 +2,21 @@ import insert from "@Core/Tools/transformation/object/arrayInsert"
 import SettingsAct from "../classes/act"
 
 export default class SettingsLayout {
-    _structure = []
+    #structure = []
 
-    _map = new Map()
+    #map = new Map()
 
     defaultAct = "settings"
 
     createAct(p = {}, r = {}) {
         const { id } = p
 
-        if (this._map.has(id)) throw new Error(`Such id (${id}) already exists`)
+        if (this.#map.has(id)) throw new Error(`Such id (${id}) already exists`)
         const children = []
         const save = new SettingsAct(p, this, children)
         const insertion = { object: save, children }
 
-        this._structure = insert(this._structure, insertion, r)
+        this.#structure = insert(this.#structure, insertion, r)
         this.mapRegister(id, save)
         return this
     }
@@ -28,19 +28,19 @@ export default class SettingsLayout {
     }
 
     getByID(id) {
-        return this._map.get(id)
+        return this.#map.get(id)
     }
 
     isIdRegistered(id) {
-        return this._map.has(id)
+        return this.#map.has(id)
     }
 
     get structure() {
-        return this._structure
+        return this.#structure
     }
 
     mapRegister(id, save) {
         if (this.isIdRegistered(id)) throw Error("Such ID is already registered")
-        return this._map.set(id, save)
+        return this.#map.set(id, save)
     }
 }

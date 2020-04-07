@@ -4,16 +4,16 @@ import Navigation from "@Core/Services/navigation"
 import { SettingsGroup } from "."
 
 export default class SettingsItem {
-    _data = {}
+    #data = {}
 
-    _parent = false
+    #parent = false
 
     generatedInstance = false
 
     constructor(data, parent) {
         if (!(parent instanceof SettingsGroup)) throw new TypeError("Only Settings Group can be a parrent")
 
-        this._parent = parent
+        this.#parent = parent
 
         new FieldsContainer([
             ["id", "dom", "options"],
@@ -33,47 +33,43 @@ export default class SettingsItem {
             },
         ]).set(data)
 
-        this._data = data
+        this.#data = data
     }
 
     get id() {
-        return this._data.id
+        return this.#data.id
     }
 
     get onupdate() {
         return (e) => {
-            this._parent.onupdate()
-            if (typeof this._data.events.onupdate === "function") return this._data.events.onupdate()
+            this.#parent.onupdate()
+            if (typeof this.#data.events.onupdate === "function") return this.#data.events.onupdate()
             return true
         }
     }
 
     get onfail() {
         return (e) => {
-            this._parent.onfail()
-            if (typeof this._data.events.onfail === "function") return this._data.events.onfail()
+            this.#parent.onfail()
+            if (typeof this.#data.events.onfail === "function") return this.#data.events.onfail()
             return true
         }
     }
 
     get parent() {
-        return this._parent
-    }
-
-    get children() {
-        return this._children
+        return this.#parent
     }
 
     get layout() {
-        return this._parent.layout
+        return this.#parent.layout
     }
 
     async render() {
-        if ("display" in this._data && !(await this._data.display())) {
+        if ("display" in this.#data && !(await this.#data.display())) {
             return false
         }
         // eslint-disable-next-line new-cap
-        this.generatedInstance = await new this._data.dom(this._data.options, Navigation.parse)
+        this.generatedInstance = await new this.#data.dom(this.#data.options, Navigation.parse)
         return this.generatedInstance
     }
 }

@@ -10,7 +10,7 @@ import "@Resources/styles/constructor.css"
 import "./Loaders"
 
 import App from "../Services/app"
-import Report from "../Services/report"
+import Report from "../Services/reportOld"
 
 if (process.env.NODE_ENV === "development") {
     require("@App/debug/dev")

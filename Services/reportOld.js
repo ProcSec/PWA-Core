@@ -6,13 +6,13 @@ import App from "./app"
 export default class Report {
     static StorageName = "console-output"
 
-    static _dbConnectionInstance = null
+    static #dbConnectionInstance = null
 
     static async DBConnection() {
         const self = this
 
-        if (!this._dbConnectionInstance) {
-            this._dbConnectionInstance = new DBTool("LogData", 1, {
+        if (!this.#dbConnectionInstance) {
+            this.#dbConnectionInstance = new DBTool("LogData", 1, {
                 upgrade(db, oldVersion, newVersion, transaction) {
                     if (oldVersion === 0) {
                         db.createObjectStore(self.StorageName, {
@@ -24,14 +24,16 @@ export default class Report {
             })
         }
 
-        return this._dbConnectionInstance.onReady()
+        return this.#dbConnectionInstance.onReady()
     }
 
+    static #dbOS
+
     static async DBOS() {
-        if (this._dbOS) return this._dbOS
+        if (this.#dbOS) return this.#dbOS
         const db = await this.DBConnection()
-        this._dbOS = db.OSTool(this.StorageName)
-        return this._dbOS
+        this.#dbOS = db.OSTool(this.StorageName)
+        return this.#dbOS
     }
 
 

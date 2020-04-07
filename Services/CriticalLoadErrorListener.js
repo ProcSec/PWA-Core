@@ -3,7 +3,7 @@ import LoadState from "./LoadState"
 
 
 export default class CriticalLoadErrorListener {
-    static _listener = (e, consoleIt = true) => {
+    static #listener = (e, consoleIt = true) => {
         function escapeHTML(unsafeText) {
             const div = document.createElement("div")
             div.innerText = unsafeText
@@ -37,12 +37,12 @@ ${escapeHTML(ua)}</pre>`
     }
 
     static get listener() {
-        return this._listener
+        return this.#listener
     }
 
     static set listener(s) {
         if (typeof s !== "function") throw TypeError("Function was expected as an error handler")
-        this._listener = s
+        this.#listener = s
         return s
     }
 }

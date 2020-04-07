@@ -1,5 +1,5 @@
 import { openDB, deleteDB } from "idb"
-import Report from "@Core/Services/report"
+import Report from "@Core/Services/reportOld"
 import ObjectStoreTool from "./ObjectStoreTool"
 
 export default class DBTool {
@@ -7,15 +7,15 @@ export default class DBTool {
 
     DBVersion = 0
 
-    _DBConnection = null
+    #DBConnection = null
 
     get DBConnection() {
-        if (this._DBConnection === null) throw new Error("DB is not ready yet")
-        return this._DBConnection
+        if (this.#DBConnection === null) throw new Error("DB is not ready yet")
+        return this.#DBConnection
     }
 
     set DBConnection(s) {
-        this._DBConnection = s
+        this.#DBConnection = s
     }
 
     upgradeAgent = null
@@ -52,15 +52,17 @@ export default class DBTool {
             reject = rej
         })
 
-        this._openWaiter = waiter
+        this.#openWaiter = waiter
 
         this.openDB().then(() => resolve(self)).catch(reject)
     }
 
-    onReady() {
-        if (this._DBConnection !== null) return Promise.resolve(this)
+    #openWaiter
 
-        return this._openWaiter
+    onReady() {
+        if (this.#DBConnection !== null) return Promise.resolve(this)
+
+        return this.#openWaiter
     }
 
     isReady = false

@@ -1,6 +1,6 @@
 import delayAction from "@Core/Tools/objects/delayAction"
 import PWA from "@App/modules/main/PWA"
-import Report from "./report"
+import Report from "./reportOld"
 import SettingsStorage from "./Settings/SettingsStorage"
 
 /* eslint-disable consistent-return */

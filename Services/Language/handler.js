@@ -1,7 +1,7 @@
 import FieldsContainer from "@Core/Tools/validation/fieldsContainer"
 import FieldChecker from "@Core/Tools/validation/fieldChecker"
 import ucFirst from "@Core/Tools/transformation/text/ucFirst"
-import Report from "../report"
+import Report from "../reportOld"
 import LanguageCore from "./core"
 
 const languagePack = LanguageCore.language
@@ -38,8 +38,8 @@ function $(string, p = undefined, useFallback = true) {
 
         let data = strings[string]
 
-        if (string.match(/^@[a-zA-Z0-9_/]+[^/]$/)) {
-            const groups = string.substr(1).split("/")
+        if (string.match(/^[a-zA-Z0-9_/]+[^/]$/)) {
+            const groups = string.split("/")
             data = strings
             string = groups[groups.length - 1]
             while (groups.length && data !== undefined) {
@@ -52,7 +52,7 @@ function $(string, p = undefined, useFallback = true) {
         if (data === undefined) throw new Error(`Such string (${string}) does not exist`)
 
         if (typeof data !== "object") throw new Error("Incorrect string")
-        if ("__index" in data && typeof data.__index === "string") return data.__index
+        if ("" in data && typeof data[""] === "string") return data[""]
         if (!("type" in data)) throw new Error("Incorrect string")
 
         if (data.type === "func") {

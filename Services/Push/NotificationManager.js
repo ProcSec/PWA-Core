@@ -3,7 +3,7 @@ import Auth from "@App/modules/mono/services/Auth"
 import MonoNotificationClusterController from "@App/modules/mono/services/Push/MonoNotificationClusterController"
 import NotificationService from "./NotificationService"
 import SW from "../SW"
-import Report from "../report"
+import Report from "../reportOld"
 
 export default class NotificationManager {
     static services = new Map()
@@ -12,11 +12,11 @@ export default class NotificationManager {
 
     static subscription = null
 
-    static _activeChecked = false
+    static #activeChecked = false
 
     static get activeChecked() {
         if (this.services.size === 0 || Auth.inited) return true
-        return this._activeChecked
+        return this.#activeChecked
     }
 
     static get service() {
@@ -26,7 +26,7 @@ export default class NotificationManager {
     static reset() {
         MonoNotificationClusterController.list = {}
         this.active = null
-        this._activeChecked = null
+        this.#activeChecked = null
         this.subscription = null
         this.services.clear()
     }
@@ -40,7 +40,7 @@ export default class NotificationManager {
             this.services.set(service.id, service)
 
             if (endpoint === null) {
-                this._activeChecked = true
+                this.#activeChecked = true
                 resolve()
                 return
             }
@@ -59,7 +59,7 @@ export default class NotificationManager {
                     this.subscription = sub
                 }
 
-                this._activeChecked = true
+                this.#activeChecked = true
                 resolve()
             }
             if (SW.registration) {

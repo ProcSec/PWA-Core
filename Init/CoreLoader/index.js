@@ -8,21 +8,22 @@ import CoreLoaderSkip from "./CoreLoaderSkip"
 
 
 class CoreLoader {
-    static _syncQueue = []
+    static #syncQueue = []
 
-    static _syncRunning = false
+    static #syncRunning = false
 
-    static _reg = new Map()
+    static #reg = new Map()
 
-    static _doneListeners = new Set()
+    static #doneListeners = new Set()
 
-    static _sessionId = `${Math.floor(Date.now() / 8640000).toString(36)}/${randomString(9)}`
+    // TODO: Move sessionId
+    static #sessionId = `${Math.floor(Date.now() / 8640000).toString(36)}/${randomString(9)}`
 
     static get sessionID() {
-        return this._sessionId
+        return this.#sessionId
     }
 
-    _loadSuccessCache = true
+    static #loadSuccessCache = true
 
     static registerTask({
         id, presence, task, async = false, alwaysResolve = false,
@@ -33,64 +34,64 @@ class CoreLoader {
         new FieldChecker({ type: "boolean" }).set(async)
         new FieldChecker({ type: "boolean" }).set(alwaysResolve)
 
-        if (this._reg.has(id)) throw new TypeError(`ID '${id}' for CoreLoader task is already set`)
+        if (this.#reg.has(id)) throw new TypeError(`ID '${id}' for CoreLoader task is already set`)
         const taskData = {
             id, presence, task, async, alwaysResolve,
         }
 
-        this._reg.set(id, taskData)
+        this.#reg.set(id, taskData)
 
-        return this._runTask(id)
+        return this.runTask(id)
     }
 
     static taskInfo(id) {
-        return this._itemToReport(this._getTask(id))
+        return this.itemToReport(this.getTask(id))
     }
 
     static getResult(id) {
-        const task = this._getTask(id)
+        const task = this.getTask(id)
         if (!task || !("result" in task)) return false
         return task.result
     }
 
     static get report() {
-        return Array.from(this._reg.values()).map(this._itemToReport)
+        return Array.from(this.#reg.values()).map(this.itemToReport)
     }
 
     static addDoneListener(task) {
-        this._doneListeners.add(task)
+        this.#doneListeners.add(task)
     }
 
     static removeDoneListener(task) {
-        this._doneListeners.delete(task)
+        this.#doneListeners.delete(task)
     }
 
-    static _getTask(id) {
-        return this._reg.get(id)
+    static getTask(id) {
+        return this.#reg.get(id)
     }
 
-    static async _runTask(id) {
-        const task = this._getTask(id)
+    static async runTask(id) {
+        const task = this.getTask(id)
         let res
 
         try {
-            if (task.async) res = await this._asyncRunner(task)
-            else res = await this._queueRunnerRecursive(task)
+            if (task.async) res = await this.asyncRunner(task)
+            else res = await this.queueRunnerRecursive(task)
         } catch (e) {
             res = e
         }
 
-        this._emitTaskDone(id)
+        this.emitTaskDone(id)
 
         return res
     }
 
-    static async _asyncRunner(task) {
+    static async asyncRunner(task) {
         let result
         let caught = false
 
         try {
-            result = await this._taskWrapper(task)
+            result = await this.taskWrapper(task)
         } catch (r) {
             caught = true
             result = r
@@ -99,13 +100,13 @@ class CoreLoader {
         task.result = result
 
         if (caught && !task.alwaysResolve) {
-            if (result.state === 1) this._loadSuccessCache = false
+            if (result.state === 1) this.#loadSuccessCache = false
             throw result
         }
         return result
     }
 
-    static async _queueRunnerRecursive(task = null) {
+    static async queueRunnerRecursive(task = null) {
         if (task !== null) {
             let promiseResolve; let
                 promiseReject
@@ -115,23 +116,23 @@ class CoreLoader {
                 promiseReject = reject
             }))
 
-            this._syncQueue.push({
+            this.#syncQueue.push({
                 task, promise, promiseResolve, promiseReject,
             })
-            if (this._syncRunning) return promise
+            if (this.#syncRunning) return promise
         }
-        if (this._syncQueue.length === 0) {
-            this._syncRunning = false
+        if (this.#syncQueue.length === 0) {
+            this.#syncRunning = false
             return false
         }
 
-        this._syncRunning = true
-        const currentTask = this._syncQueue.shift()
+        this.#syncRunning = true
+        const currentTask = this.#syncQueue.shift()
 
         let result
         let caught = false
         try {
-            result = await this._taskWrapper(currentTask.task)
+            result = await this.taskWrapper(currentTask.task)
         } catch (resultThrow) {
             result = resultThrow
             caught = true
@@ -141,21 +142,21 @@ class CoreLoader {
 
         if (!caught || currentTask.alwaysResolve) currentTask.promiseResolve(result)
         else {
-            if (result.state === 1) this._loadSuccessCache = false
+            if (result.state === 1) this.#loadSuccessCache = false
             currentTask.promiseReject(result)
         }
 
-        this._queueRunnerRecursive()
+        this.queueRunnerRecursive()
         return true
     }
 
-    static async _taskWrapper(taskData) {
+    static async taskWrapper(taskData) {
         let state = 0
         let answer
         let data
         let type = 0
 
-        if (this._loadSuccessCache === false) return false
+        if (this.#loadSuccessCache === false) return false
 
         try {
             const res = await taskData.task()
@@ -177,8 +178,8 @@ class CoreLoader {
             }
         }
 
-        if (state === 2 && this._loadSuccessCache === 0) this._loadSuccessCache = 2
-        else if (state === 1) this._loadSuccessCache = 1
+        if (state === 2 && this.#loadSuccessCache === 0) this.#loadSuccessCache = 2
+        else if (state === 1) this.#loadSuccessCache = 1
 
         const ret = {
             state, answer, data, type,
@@ -188,15 +189,15 @@ class CoreLoader {
         throw ret
     }
 
-    static _emitTaskDone(id) {
+    static emitTaskDone(id) {
         try {
-            this._doneListeners.forEach((el) => el(this.taskInfo(id)))
+            this.#doneListeners.forEach((el) => el(this.taskInfo(id)))
         } catch (e) {
             // No errors
         }
     }
 
-    static _itemToReport(el) {
+    static itemToReport(el) {
         return {
             id: el.id,
             name: el.presence,

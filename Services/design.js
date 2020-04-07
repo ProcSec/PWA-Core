@@ -1,5 +1,5 @@
 import themesList from "@Generated/themes"
-import Report from "./report"
+import Report from "./reportOld"
 
 export default class Design {
     static theme = "default"

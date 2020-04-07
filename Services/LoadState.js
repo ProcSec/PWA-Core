@@ -1,13 +1,13 @@
 export default class LoadState {
-    static _state = false;
+    static #state = false;
 
     static get is() {
-        return this._state
+        return this.#state
     }
 
     static set is(a) {
         if (a === true) {
-            this._state = true
+            this.#state = true
             this.ondone()
         }
     }

@@ -2,7 +2,7 @@ import FieldsContainer from "@Core/Tools/validation/fieldsContainer"
 import FieldChecker from "@Core/Tools/validation/fieldChecker"
 
 export default class DBUserPresence {
-    static _register = []
+    static #register = []
 
     static registerNewPresence(data) {
         new FieldsContainer([
@@ -51,7 +51,7 @@ export default class DBUserPresence {
                 || data.config.max < data.config.min) throw new Error("Incorrect statement")
         }
 
-        this._register.push(data);
+        this.#register.push(data);
 
         (async () => {
             if ("quota" in data && await data.size() > await data.quota()) {
@@ -62,10 +62,10 @@ export default class DBUserPresence {
     }
 
     static getAll() {
-        return this._register
+        return this.#register
     }
 
     static get(id) {
-        return this._register.find((e) => e.id === id)
+        return this.#register.find((e) => e.id === id)
     }
 }

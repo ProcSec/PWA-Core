@@ -1,16 +1,20 @@
 export default class CoreLoaderResult {
     type = 0
 
+    #answer
+
+    #data
+
     constructor(answer = null, data = null) {
-        this._answer = answer
-        this._data = data
+        this.#answer = answer
+        this.#data = data
     }
 
     get data() {
-        return this._data
+        return this.#data
     }
 
     get answer() {
-        return this._answer
+        return this.#answer
     }
 }

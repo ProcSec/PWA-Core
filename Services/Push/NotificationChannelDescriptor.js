@@ -7,8 +7,8 @@ export default class NotificationChannelDescriptor {
     constructor({
         type, id,
         icon = "notifications",
-        sign = { mode: "local", value: "@push/i/std/sign" },
-        description = { mode: "local", value: "@push/i/std/description" },
+        sign = { mode: "local", value: "push/i/std/sign" },
+        description = { mode: "local", value: "push/i/std/description" },
     }) {
         new FieldsContainer([
             ["type", "id", "icon", "sign", "description"],
@@ -56,7 +56,11 @@ export default class NotificationChannelDescriptor {
 
     static async templateWorker({ mode, value }) {
         if (mode === "text") return value
-        if (mode === "local") return $(...(Array.isArray(value) ? value : [value]))
+        if (mode === "local") {
+            const inv = (Array.isArray(value) ? value : [value])
+            if (typeof inv[0] === "string" && inv[0][0] === "@") inv[0] = inv[0].substr(1)
+            return $(...inv)
+        }
         return `[${value}]`
     }
 }

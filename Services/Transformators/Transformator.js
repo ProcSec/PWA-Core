@@ -30,12 +30,12 @@ export default class Transformator {
 
     data = {}
 
-    _unlockData = null
+    #unlockData = null
 
-    _unlocked = false
+    #unlocked = false
 
     get unlocked() {
-        return this._unlocked
+        return this.#unlocked
     }
 
     constructor(data = {}) {
@@ -43,21 +43,21 @@ export default class Transformator {
     }
 
     async unlock(input = null, auto = false) {
-        this._unlocked = true
+        this.#unlocked = true
         return true
     }
 
     async lockdown() {
-        this._unlocked = false
-        this._unlockData = null
+        this.#unlocked = false
+        this.#unlockData = null
         return true
     }
 
-    async _encoder(input, flags) {
+    async encoder(input, flags) {
         return input
     }
 
-    async _decoder(input, flags) {
+    async decoder(input, flags) {
         return input
     }
 
@@ -65,13 +65,13 @@ export default class Transformator {
         if (!this.unlocked && (flags & TransformatorProps.flag.autoUnlock)) this.unlock(input, true)
         if (!this.unlocked) throw new Error("The key is not unlocked")
 
-        return this._decoder(input, TransformatorProps.flag.none | flags)
+        return this.decoder(input, TransformatorProps.flag.none | flags)
     }
 
     async close(input, flags = TransformatorProps.flag.autoUnlock) {
         if (!this.unlocked && (flags & TransformatorProps.flag.autoUnlock)) this.unlock(input, true)
         if (!this.unlocked) throw new Error("The key is not unlocked")
 
-        return this._encoder(input, TransformatorProps.flag.none | flags)
+        return this.encoder(input, TransformatorProps.flag.none | flags)
     }
 }

@@ -2,9 +2,9 @@ import FieldChecker from "@Core/Tools/validation/fieldChecker"
 import Transformator from "./Transformator"
 
 export default class TransformatorsRegistry {
-    static _registry = new Set()
+    static #registry = new Set()
 
-    static _instances = new Map()
+    static #instances = new Map()
 
     static add(tfConstructor) {
         if (!(tfConstructor === Transformator
@@ -22,41 +22,41 @@ export default class TransformatorsRegistry {
             throw new TypeError("Key name expected")
         }
 
-        this._registry.add(tfConstructor)
+        this.#registry.add(tfConstructor)
         return true
     }
 
     static addInstance(id, tf, description = null) {
         if (!(tf instanceof Transformator)) throw new TypeError("Transformator instance expected")
-        if (this._instances.has(id)) throw new Error("This ID is already set")
+        if (this.#instances.has(id)) throw new Error("This ID is already set")
 
-        tf.__tfRegistryDescription__ = description
+        tf.tfRegistryDescription = description
 
-        this._instances.set(id, tf)
+        this.#instances.set(id, tf)
         return true
     }
 
     static getAll() {
-        return Array.from(this._registry)
+        return Array.from(this.#registry)
     }
 
     static getAllInstnces() {
-        return Array.from(this._instances.values())
+        return Array.from(this.#instances.values())
     }
 
     static getOfType(type) {
-        return Array.from(this._registry).filter((e) => e.type === type)
+        return Array.from(this.#registry).filter((e) => e.type === type)
     }
 
     static getOfTypeInstances(type) {
-        return Array.from(this._instances.values()).filter((e) => e.constructor.type === type)
+        return Array.from(this.#instances.values()).filter((e) => e.constructor.type === type)
     }
 
     static getByID(id) {
-        return Array.from(this._registry).find((e) => e.id === id)
+        return Array.from(this.#registry).find((e) => e.id === id)
     }
 
     static getByIDInstance(id) {
-        return this._instances.get(id)
+        return this.#instances.get(id)
     }
 }

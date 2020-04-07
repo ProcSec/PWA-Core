@@ -2,7 +2,7 @@ import FieldsContainer from "@Core/Tools/validation/fieldsContainer"
 import FieldChecker from "@Core/Tools/validation/fieldChecker"
 import { Nav } from "@Environment/Library/DOM/buildBlock"
 import { CoreLoader } from "@Core/Init/CoreLoader"
-import Report from "./report"
+import Report from "./reportOld"
 
 
 window.history.replaceState({ pointer: 0, session: CoreLoader.sessionID }, "")
@@ -225,7 +225,7 @@ export default class Navigation {
         return true
     }
 
-    static _InitErrorHandler() {
+    static InitErrorHandler() {
         /*
                 this.url = {
                     module: "name",
@@ -234,7 +234,7 @@ export default class Navigation {
                 */
     }
 
-    static _defaultScreenHandler() {
+    static defaultScreenHandler() {
         /*
                 this.url = {
                     module: "name",
@@ -244,18 +244,18 @@ export default class Navigation {
     }
 
     static get InitNavigationError() {
-        return this._InitErrorHandler
+        return this.InitErrorHandler
     }
 
     static get defaultScreen() {
-        return this._defaultScreenHandler
+        return this.defaultScreenHandler
     }
 
     static set InitNavigationError(s) {
-        this._InitErrorHandler = s
+        this.InitErrorHandler = s
     }
 
     static set defaultScreen(s) {
-        this._defaultScreenHandler = s
+        this.defaultScreenHandler = s
     }
 }

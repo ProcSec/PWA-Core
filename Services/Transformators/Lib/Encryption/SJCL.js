@@ -16,24 +16,28 @@ export default class SJCL extends Transformator {
         if (password !== null) this.unlock(password)
     }
 
+    #unlockData
+
+    #unlocked = false
+
     unlock(password, auto) {
         if (auto === true) password = ""
 
-        this._unlockData = password
-        this._unlocked = true
+        this.#unlockData = password
+        this.#unlocked = true
     }
 
-    _encoder(input, flags) {
+    encoder(input, flags) {
         return sjcl.codec.base64.fromBits(
             sjcl.codec.utf8String.toBits(
-                sjcl.encrypt(this._unlockData, input),
+                sjcl.encrypt(this.#unlockData, input),
             ),
         )
     }
 
-    _decoder(input, flags) {
+    decoder(input, flags) {
         return sjcl.decrypt(
-            this._unlockData, sjcl.codec.utf8String.fromBits(
+            this.#unlockData, sjcl.codec.utf8String.fromBits(
                 sjcl.codec.base64.toBits(input),
             ),
         )

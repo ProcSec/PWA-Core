@@ -1,4 +1,4 @@
-import Report from "@Core/Services/report"
+import Report from "@Core/Services/reportOld"
 import errorToObject from "@Core/Tools/transformation/object/errorToObject"
 
 window.addEventListener("error", (e) => {
