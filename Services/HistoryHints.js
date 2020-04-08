@@ -1,18 +1,18 @@
 import DBTool from "@Core/Tools/db/DBTool"
-
-// TODO: Export config
-const HistoryHintsConfig = [
-]
+import HistoryHintsConfig from "./HistoryHintsConfig"
 
 export default class HistoryHints {
-    static connection = new DBTool("userActivityHistory", 1, {
+    static connection = new DBTool("userActivityHistory", HistoryHintsConfig.version, {
         upgrade(db, oldVersion, newVersion, transaction) {
             if (oldVersion === 0) {
-                HistoryHintsConfig.forEach((e) => {
-                    db.createObjectStore(e.name, {
-                        keyPath: "key",
-                        autoIncrement: true,
-                    })
+                HistoryHintsConfig.config.forEach((e) => {
+                    if (e.version <= HistoryHintsConfig.version
+                        && !Array.from(db.objectStoreNames).includes(e.name)) {
+                        db.createObjectStore(e.name, {
+                            keyPath: "key",
+                            autoIncrement: true,
+                        })
+                    }
                 })
             }
         },
