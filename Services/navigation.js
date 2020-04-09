@@ -1,11 +1,11 @@
 import FieldsContainer from "@Core/Tools/validation/fieldsContainer"
 import FieldChecker from "@Core/Tools/validation/fieldChecker"
 import { Nav } from "@Environment/Library/DOM/buildBlock"
-import { CoreLoader } from "@Core/Init/CoreLoader"
 import Report from "./reportOld"
+import ReportSession from "./Report/ReportSession"
 
 
-window.history.replaceState({ pointer: 0, session: CoreLoader.sessionID }, "")
+window.history.replaceState({ pointer: 0, session: ReportSession.id }, "")
 
 export default class Navigation {
     static prefix = "/"
@@ -48,7 +48,7 @@ export default class Navigation {
 
             return stringURL
         }
-        window.history.pushState({ pointer: ++this.pointer, session: CoreLoader.sessionID }, "", url)
+        window.history.pushState({ pointer: ++this.pointer, session: ReportSession.id }, "", url)
         this.listener()
         return this.parseURL(url)
     }
@@ -161,7 +161,7 @@ export default class Navigation {
     static get whatHappened() {
         if (this.history.length === 0) this.history.push(this.url)
 
-        if (window.history.state.session !== CoreLoader.sessionID) return "change"
+        if (window.history.state.session !== ReportSession.id) return "change"
         if (window.history.state.pointer === this.pointer) return "change"
         if (window.history.state.pointer > this.pointer) return "forward"
         if (window.history.state.pointer < this.pointer) return "back"

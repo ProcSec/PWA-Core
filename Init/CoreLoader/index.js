@@ -1,5 +1,4 @@
 import FieldChecker from "@Core/Tools/validation/fieldChecker"
-import randomString from "@Core/Tools/objects/randomString"
 import CoreLoaderWarning from "./CoreLoaderWarning"
 import CoreLoaderThrowable from "./CoreLoaderThrowable"
 import CoreLoaderError from "./CoreLoaderError"
@@ -15,13 +14,6 @@ class CoreLoader {
     static #reg = new Map()
 
     static #doneListeners = new Set()
-
-    // TODO: Move sessionId
-    static #sessionId = `${Math.floor(Date.now() / 8640000).toString(36)}/${randomString(9)}`
-
-    static get sessionID() {
-        return this.#sessionId
-    }
 
     static #loadSuccessCache = true
 
