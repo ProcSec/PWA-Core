@@ -1,7 +1,7 @@
 export default function errorToObject(e) {
     function replaceErrors(jk, value) {
         if (value instanceof Error) {
-            const error = {}
+            const error = { "[[SPECIAL]]": "error" }
 
             Object.getOwnPropertyNames(value).forEach((key) => {
                 error[key] = value[key]

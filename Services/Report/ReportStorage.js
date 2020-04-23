@@ -1,4 +1,5 @@
 import DBTool from "@Core/Tools/db/DBTool"
+import { Report } from "."
 
 export default class ReportStorage {
     static #connection = null
@@ -33,7 +34,7 @@ export default class ReportStorage {
         return this.#dbOS
     }
 
-    static async save(...log) {
+    static async save(report) {
         try {
             log = log.map((e) => {
                 const s = JSON.stringify(e)
@@ -49,7 +50,27 @@ export default class ReportStorage {
         }
     }
 
+    static transformSpecial(object) {
+        return JSON.parse(JSON.stringify(object, (k, value) => {
+            this.#hooks.forEach((hook) => {
+                try {
+                    value = hook.hook(k, value)
+                } catch (e) {
+                    Report.add([hook.name, e], ["report.storage.hookError"])
+                }
+            })
+        }))
+    }
+
     static async fallbackSave(...log) {
 
+    }
+
+    static #hooks = []
+
+    static addTransformHook(func, name) {
+        if (typeof func !== "function") throw new TypeError("Function expected")
+        if (typeof name !== "string") throw new TypeError("String name expected")
+        this.#hooks.push({ hook: func, name })
     }
 }

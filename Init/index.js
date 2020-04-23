@@ -1,3 +1,4 @@
+import "@Core/Services/Report/Init"
 import "./errorListener"
 import "@App/loaders/Presets"
 import "@App/debug/recovery"
@@ -10,14 +11,13 @@ import "@Resources/styles/constructor.css"
 import "./Loaders"
 
 import App from "../Services/app"
-import Report from "../Services/reportOld"
 
 if (process.env.NODE_ENV === "development") {
     require("@App/debug/dev")
 }
 
 
-Report.writeNoTrace(`%c   APP   %c ${App.appName}`, "background: #3f51b5; color: #ffffff", "")
-Report.writeNoTrace(`%c VERSION %c ${App.version} (${App.branch}) / ${App.buildDate}`, "background: #3f51b5; color: #ffffff", "")
-Report.writeNoTrace(`%c  DEBUG  %c ${App.debug}`, "background: #3f51b5; color: #ffffff", "")
-Report.writeNoTrace("")
+console.log(`%c   APP   %c ${App.appName}`, "background: #3f51b5; color: #ffffff", "")
+console.log(`%c VERSION %c ${App.version} (${App.branch}) / ${App.buildDate}`, "background: #3f51b5; color: #ffffff", "")
+console.log(`%c  DEBUG  %c ${App.debug}`, "background: #3f51b5; color: #ffffff", "")
+console.log("")
