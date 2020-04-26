@@ -1,9 +1,9 @@
 import Report from "./Report"
-import ReportLogger from "./ReportLogger"
-import ReportSession from "./ReportSession"
-import ReportStorage from "./ReportStorage"
-import ReportTag from "./ReportTag"
-import ReportTags from "./ReportTags"
+import ReportLogger from "./Logger"
+import ReportSession from "./Session"
+import ReportStorage from "./Storage"
+import ReportTag from "./Tag"
+import ReportTags from "./Tags"
 
 export {
     Report,

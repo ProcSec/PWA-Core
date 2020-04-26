@@ -15,6 +15,15 @@ export default class ReportLogger {
         if (report.displayLevel === 3) func = console.error
 
         func(templateString, ...styles, ...report.log)
+        if (report.printTrace && report.getTrace) this.outputTrace(report.trace)
+    }
+
+    static outputTrace(lines) {
+        console.groupCollapsed("Trace")
+        lines.forEach((line) => {
+            console.log(line)
+        })
+        console.groupEnd()
     }
 
     static loggingLevel = -1

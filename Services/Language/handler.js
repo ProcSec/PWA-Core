@@ -1,7 +1,7 @@
 import FieldsContainer from "@Core/Tools/validation/fieldsContainer"
 import FieldChecker from "@Core/Tools/validation/fieldChecker"
 import ucFirst from "@Core/Tools/transformation/text/ucFirst"
-import Report from "../reportOld"
+import { Report } from "../Report"
 import LanguageCore from "./core"
 
 const languagePack = LanguageCore.language
@@ -87,7 +87,7 @@ function $(string, p = undefined, useFallback = true) {
         throw new Error("Unsupported Smart-String")
     } catch (e) {
         if (useFallback) {
-            Report.write("Language string error", e)
+            Report.add(e, ["lang.stringError"])
             return fallback(string)
         }
         throw e

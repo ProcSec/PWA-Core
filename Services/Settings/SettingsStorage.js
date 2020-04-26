@@ -1,6 +1,6 @@
 import DBTool from "../../Tools/db/DBTool"
 import SettingsCheckProvider from "./SettingsCheckProvider"
-import Report from "../reportOld"
+import { Report } from "../Report"
 
 export default class SettingsStorage {
     static ObjectStoreNames = ["user", "flags"]
@@ -58,7 +58,7 @@ export default class SettingsStorage {
 
             return resv
         } catch (e) {
-            Report.write("Failed getting settings", e)
+            Report.add(e, ["settings.get.failure"])
             return undefined
         }
     }
@@ -71,7 +71,7 @@ export default class SettingsStorage {
             await db.delete(setting)
             return true
         } catch (e) {
-            Report.write("Failed resetting settings", e)
+            Report.add(e, ["settings.reset.failure"])
             return false
         }
     }
@@ -96,7 +96,7 @@ export default class SettingsStorage {
             await si[3](value, ov, setting, si[2])
             return true
         } catch (e) {
-            Report.write("Failed saving settings", e)
+            Report.add(e, ["settings.set.failure"])
             return false
         }
     }
@@ -130,7 +130,7 @@ export default class SettingsStorage {
 
             return resv
         } catch (e) {
-            Report.write("Failed getting flag", flag, e)
+            Report.add(["FLAG", flag, e], ["settings.set.failure"])
             return undefined
         }
     }
@@ -141,7 +141,7 @@ export default class SettingsStorage {
             const res = await db.getAll()
             return res
         } catch (e) {
-            Report.write("Failed getting all flags", e)
+            Report.add(["ALL FLAGS", e], ["settings.get.failure"])
             return undefined
         }
     }
@@ -154,7 +154,7 @@ export default class SettingsStorage {
             await db.delete(setting)
             return true
         } catch (e) {
-            Report.write("Failed resetting flag", e)
+            Report.add(["FLAG", setting, e], ["settings.reset.failure"])
             return false
         }
     }
@@ -179,7 +179,7 @@ export default class SettingsStorage {
             await si[3](value, ov, flag, si[2])
             return true
         } catch (e) {
-            Report.write("Failed setting flag", flag, e)
+            Report.add(["FLAG", flag, e], ["settings.set.failure"])
             return false
         }
     }

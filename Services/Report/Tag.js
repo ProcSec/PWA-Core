@@ -9,6 +9,7 @@ export default class ReportTag {
         level = -1, // -1: debug, 0: verbose, 1: info, 2: warn, 3: error
         displayLevel = null,
         getTrace = true,
+        printTrace = false,
         db = true,
         dbEnforceFallback = false,
         priority = 0,
@@ -20,6 +21,7 @@ export default class ReportTag {
         this.level = level
         this.displayLevel = (displayLevel === null ? level : displayLevel)
         this.getTrace = getTrace
+        this.printTrace = printTrace
         this.db = db
         this.dbEnforceFallback = dbEnforceFallback
     }

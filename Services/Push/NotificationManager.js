@@ -3,7 +3,7 @@ import Auth from "@App/modules/mono/services/Auth"
 import MonoNotificationClusterController from "@App/modules/mono/services/Push/MonoNotificationClusterController"
 import NotificationService from "./NotificationService"
 import SW from "../SW"
-import Report from "../reportOld"
+import { Report } from "../Report"
 
 export default class NotificationManager {
     static services = new Map()
@@ -109,6 +109,6 @@ export default class NotificationManager {
         })
         await this.service.activated(newSub)
         this.subscription = newSub
-        Report.write("Push subscription made")
+        Report.add(this.subscription, ["push.subscription"])
     }
 }

@@ -36,6 +36,15 @@ const tags = [
             },
         }),
 
+    new ReportTag("report.storage.error",
+        {
+            badge: {
+                sign: "DB Error",
+                print: true,
+            },
+            level: 3,
+        }),
+
     new ReportTag("report.unknownTag",
         {
             badge: {
@@ -61,6 +70,14 @@ const tags = [
             },
             level: 3,
         }),
+    new ReportTag("report.session.update",
+        {
+            badge: {
+                sign: "Property",
+            },
+            displayLevel: -1,
+            level: 1,
+        }),
     new ReportTag("report.storage.hookError",
         {
             badge: {
@@ -69,6 +86,7 @@ const tags = [
             },
             level: 3,
         }),
+
 ]
 
 tags.forEach((t) => ReportTags.add(t))

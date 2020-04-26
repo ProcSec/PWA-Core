@@ -1,5 +1,5 @@
 import { openDB, deleteDB } from "idb"
-import Report from "@Core/Services/reportOld"
+import { Report } from "@Core/Services/Report"
 import ObjectStoreTool from "./ObjectStoreTool"
 
 export default class DBTool {
@@ -35,12 +35,12 @@ export default class DBTool {
         this.upgradeAgent = upgrade
         const self = this
         this.blockedAgent = (...e) => {
-            Report.write("IDB Open blocked. Unblocking...", e)
+            Report.add(e, "idb.blocked")
             blocked(e)
             self.DBConnection.close()
         }
         this.blockingAgent = (...e) => {
-            Report.write("IDB Open is being blocked.", e)
+            Report.add(e, "idb.blocking")
             blocking(e)
         }
 

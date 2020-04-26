@@ -1,5 +1,5 @@
 import themesList from "@Generated/themes"
-import Report from "./reportOld"
+import { Report } from "./Report"
 
 export default class Design {
     static theme = "default"
@@ -70,7 +70,7 @@ export default class Design {
             try {
                 newTheme = await require(`@Themes/${name}/theme.css`)
             } catch (e) {
-                Report.write("Failed to load theme", e)
+                Report.add(e, ["style.loadError"])
                 throw new Error(1) // No such theme
             }
         }
@@ -88,7 +88,7 @@ export default class Design {
         try {
             if (newTheme) newTheme.use()
         } catch (e) {
-            Report.write("Failed to connect theme", e, newTheme)
+            Report.add([e, newTheme], ["style.changeError"])
             throw new Error(3) // Failed connecting the theme
         }
 

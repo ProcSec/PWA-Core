@@ -1,4 +1,4 @@
-import ReportTag from "./ReportTag"
+import ReportTag from "./Tag"
 import Report from "./Report"
 
 export default class ReportTags {
@@ -8,8 +8,8 @@ export default class ReportTags {
         return this.#tags
     }
 
-    static get(name) {
-        if (!(name in this.#tags)) Report.add(name, ["report.unknownTag"])
+    static get(name, recursionStack = 0) {
+        if (!(name in this.#tags)) Report.add(name, ["report.unknownTag"], { recursionStack: ++recursionStack })
         return this.#tags[name]
     }
 
@@ -20,6 +20,5 @@ export default class ReportTags {
         }
 
         this.#tags[tag.name] = tag
-        console.log("TAG", tag)
     }
 }

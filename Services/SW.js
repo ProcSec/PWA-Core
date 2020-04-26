@@ -1,6 +1,6 @@
 import delayAction from "@Core/Tools/objects/delayAction"
 import PWA from "@App/modules/main/PWA"
-import Report from "./reportOld"
+import { Report } from "./Report"
 import SettingsStorage from "./Settings/SettingsStorage"
 
 /* eslint-disable consistent-return */
@@ -64,7 +64,7 @@ export default class SW {
             navigator.serviceWorker.addEventListener("controllerchange", (event) => {
                 if (preventDevToolsReloadLoop) return
                 preventDevToolsReloadLoop = true
-                Report.write("Ready to reload")
+                Report.add([], ["sw.reloadReady"])
                 SW.onUpdate()
             })
 
@@ -97,7 +97,7 @@ export default class SW {
     }
 
     static newSWEvent(registration) {
-        Report.write("New app update found")
+        Report.add([], ["sw.newUpdate"])
     }
 
     static applyUpdate(registration) {
@@ -109,7 +109,7 @@ export default class SW {
     }
 
     static fail(error, [resolve, reject]) {
-        Report.write("SW Error", error)
+        Report.add(error, ["sw.error"])
         reject(error)
     }
 

@@ -10,6 +10,7 @@ import "@Resources/styles/constructor.css"
 
 import "./Loaders"
 
+import { Report } from "@Core/Services/Report"
 import App from "../Services/app"
 
 if (process.env.NODE_ENV === "development") {
@@ -17,7 +18,7 @@ if (process.env.NODE_ENV === "development") {
 }
 
 
-console.log(`%c   APP   %c ${App.appName}`, "background: #3f51b5; color: #ffffff", "")
-console.log(`%c VERSION %c ${App.version} (${App.branch}) / ${App.buildDate}`, "background: #3f51b5; color: #ffffff", "")
-console.log(`%c  DEBUG  %c ${App.debug}`, "background: #3f51b5; color: #ffffff", "")
-console.log("")
+Report.add(String(App.appName), ["APP"])
+Report.add(`${App.version} (${App.branch}) / ${App.buildDate}`, ["VERSION"])
+Report.add(String(App.debug), ["DEBUG"])
+Report.add([], ["dummy"])

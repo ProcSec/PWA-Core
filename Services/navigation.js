@@ -1,8 +1,7 @@
 import FieldsContainer from "@Core/Tools/validation/fieldsContainer"
 import FieldChecker from "@Core/Tools/validation/fieldChecker"
 import { Nav } from "@Environment/Library/DOM/buildBlock"
-import Report from "./reportOld"
-import ReportSession from "./Report/ReportSession"
+import { Report, ReportSession } from "./Report"
 
 
 window.history.replaceState({ pointer: 0, session: ReportSession.id }, "")
@@ -182,7 +181,7 @@ export default class Navigation {
         if (event === "change") {
             this.history.push(url)
             this.historyCurrent.push(Object.create(null))
-            Report.writeNoTrace("%c :NAV ", "background: #3f51b5; color: #ffffff", parsed)
+            Report.add(parsed, ["nav.change"])
             const navigationEvent = new CustomEvent("appNavigation", { cancelable: true, detail: { type: "change", parsed } })
             window.dispatchEvent(navigationEvent)
             if (navigationEvent.defaultPrevented) return null
@@ -192,7 +191,7 @@ export default class Navigation {
         if (event === "back") {
             this.historyFuture.push(this.history.pop())
             this.historyCurrentFuture.push(this.historyCurrent.pop())
-            Report.writeNoTrace("%c <NAV ", "background: #3f51b5; color: #ffffff", parsed)
+            Report.add(parsed, ["nav.back"])
             const navigationEvent = new CustomEvent("appNavigation", { cancelable: true, detail: { type: "back", parsed } })
             window.dispatchEvent(navigationEvent)
             if (navigationEvent.defaultPrevented) return null
@@ -202,7 +201,7 @@ export default class Navigation {
         if (event === "forward") {
             this.history.push(this.historyFuture.pop())
             this.historyCurrent.push(this.historyCurrentFuture.pop())
-            Report.writeNoTrace("%c >NAV ", "background: #3f51b5; color: #ffffff", parsed)
+            Report.add(parsed, ["nav.forward"])
             const navigationEvent = new CustomEvent("appNavigation", { cancelable: true, detail: { type: "forward", parsed } })
             window.dispatchEvent(navigationEvent)
             if (navigationEvent.defaultPrevented) return null
