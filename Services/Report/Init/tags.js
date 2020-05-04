@@ -42,6 +42,7 @@ const tags = [
                 sign: "DB Error",
                 print: true,
             },
+            dbEnforceFallback: true,
             level: 3,
         }),
 
@@ -84,6 +85,7 @@ const tags = [
                 sign: "Hook Error",
                 print: true,
             },
+            dbEnforceFallback: true,
             level: 3,
         }),
 

@@ -23,18 +23,20 @@ export default class Report {
 
     static add(log, tagsNames = [], { recursionStack = 0 } = {}) {
         if (recursionStack > 3) return
-        const tags = []
-        tags.push(ReportTags.get("default"))
-        tagsNames = (Array.isArray(tagsNames) ? tagsNames : [tagsNames])
-        tagsNames.forEach((e) => {
-            const mTags = e.split(".")
-            mTags.forEach((m, i) => {
-                tags.push(ReportTags.get(mTags.slice(0, i + 1).join("."), recursionStack))
+        delayAction(() => {
+            const tags = []
+            tags.push(ReportTags.get("default"))
+            tagsNames = (Array.isArray(tagsNames) ? tagsNames : [tagsNames])
+            tagsNames.forEach((e) => {
+                const mTags = e.split(".")
+                mTags.forEach((m, i) => {
+                    tags.push(ReportTags.get(mTags.slice(0, i + 1).join("."), recursionStack))
+                })
             })
-        })
 
-        const r = new Report({ log, tags, recursionStack })
-        this.process(r)
+            const r = new Report({ log, tags, recursionStack })
+            this.process(r)
+        })
     }
 
     static process(report) {

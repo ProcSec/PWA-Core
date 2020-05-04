@@ -5,9 +5,9 @@ import { Report } from "."
 export default class ReportStorage {
     static #connection = null
 
-    static #logObjectStorageName = "log"
+    static logObjectStorageName = "log"
 
-    static #lsItemName = "report-fallback-log"
+    static lsItemName = "report-fallback-log"
 
     static async DBConnection() {
         const self = this
@@ -16,7 +16,7 @@ export default class ReportStorage {
             this.#connection = new DBTool("ReportData", 1, {
                 upgrade(db, oldVersion, newVersion, transaction) {
                     if (oldVersion === 0) {
-                        db.createObjectStore(self.#logObjectStorageName, {
+                        db.createObjectStore(self.logObjectStorageName, {
                             keyPath: "key",
                             autoIncrement: true,
                         })
@@ -33,24 +33,25 @@ export default class ReportStorage {
     static async DBOS() {
         if (this.#dbOS) return this.#dbOS
         const db = await this.DBConnection()
-        this.#dbOS = db.OSTool(this.#logObjectStorageName)
+        this.#dbOS = db.OSTool(this.logObjectStorageName)
         return this.#dbOS
     }
 
     static async save(report, { recursionStack = 0 } = {}) {
         if (this.loggingLevel === null || report.level < this.loggingLevel || !report.db) return
-        let data = {}
+        let data = false
         let useFallback = true
         if (!report.dbEnforceFallback) {
             try {
                 const log = this.transformSpecial(report.log, report)
-                const os = await this.DBOS()
                 data = {
                     tags: report.original.tags.map((e) => e.name).filter((e) => e !== "default"),
                     log,
                     time: Date.now(),
                     session: report.original.session.id,
                 }
+
+                const os = await this.DBOS()
 
                 await os.add(
                     data,
@@ -61,27 +62,36 @@ export default class ReportStorage {
             }
         }
         if (useFallback) {
-            this.fallbackSave(data)
+            this.fallbackSave(data || { log: report.log }, report)
         }
     }
 
-    static transformSpecial(object, report) {
+    static transformSpecial(object, report = false) {
         return JSON.parse(JSON.stringify(object, (k, value) => {
             this.#hooks.forEach((hook) => {
                 try {
                     value = hook.hook(k, value)
                 } catch (e) {
-                    Report.add([hook.name, e], ["report.storage.hookError"], { recursionStack: ++report.original.recursionStack })
+                    Report.add([hook.name, e], ["report.storage.hookError"], { recursionStack: (report ? ++report.original.recursionStack : 1) })
                 }
             })
             return value
         }))
     }
 
-    static async fallbackSave(object) {
-        localStorage.setItem(this.#lsItemName,
-            `${`${localStorage.getItem(this.#lsItemName)},` || ""
-            }${JSON.stringify(JSON.stringify(object))}`)
+    static async fallbackSave(object, report) {
+        try {
+            object = this.transformSpecial(object, report)
+        } catch (e) {
+            // Ignore error
+        }
+
+        let str = ""
+        const cur = localStorage.getItem(this.lsItemName)
+        const n = JSON.stringify(JSON.stringify(object))
+        str += (cur === null ? "" : `${cur },`) + n
+
+        localStorage.setItem(this.lsItemName, str)
     }
 
     static #hooks = []
@@ -97,11 +107,11 @@ export default class ReportStorage {
         let dbNotice = false
         let dbData = []
         try {
-            dbData = os.getAll()
+            dbData = Array.from(await os.getAll())
         } catch (e) {
             dbNotice = e
         }
-        const ls = JSON.parse(`[${localStorage.getItem(this.#lsItemName)}]`)
+        const ls = JSON.parse(`[${localStorage.getItem(this.lsItemName) || ""}]`)
             .map((e) => Object.assign(JSON.parse(e), { fallback: true }))
         return [
             ...(dbNotice ? [

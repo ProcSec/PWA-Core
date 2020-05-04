@@ -1,3 +1,5 @@
+import size from "../objects/size"
+
 export default class ObjectStoreTool {
     connection = null
 
@@ -61,14 +63,7 @@ export default class ObjectStoreTool {
                 .then(
                     function iter(cursor) {
                         if (!cursor) return resolve(self.size)
-                        self.size += JSON.stringify(cursor.value).length
-
-                        Object.keys(cursor.value).forEach((e) => {
-                            if (e in cursor.value
-                                && cursor.value[e] instanceof Blob) {
-                                self.size += cursor.value[e]
-                            }
-                        })
+                        self.size += size(cursor.value)
 
                         return cursor.continue().then(iter)
                     },
@@ -182,21 +177,10 @@ export default class ObjectStoreTool {
             const os = this
             const cur = await os.createCursor(range, direction, true)
             function iter(cursor) {
-                let size = 0
                 if (!cursor || (allSize / thisAllSize) > percent) return resolve(allSize)
-                size += JSON.stringify(cursor.value).length
 
-                Object.keys(cursor.value).forEach((e) => {
-                    if (e in cursor.value
-                        && cursor.value[e] instanceof Blob) {
-                        size += cursor.value[e]
-                    }
-                })
-
-                allSize += size
-
+                allSize += size(cursor.value)
                 cursor.delete()
-
                 return cursor.continue().then(iter)
             }
             iter(cur)
