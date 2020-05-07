@@ -8,8 +8,8 @@ CoreLoader.registerTask({
         if (process.env.NODE_ENV === "development") {
             require("@App/debug/testlab")
         }
-
         require("./UI")
+
         LoadState.is = true
 
         if (process.env.NODE_ENV === "development") {

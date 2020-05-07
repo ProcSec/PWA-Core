@@ -89,7 +89,7 @@ export default class ReportStorage {
         let str = ""
         const cur = localStorage.getItem(this.lsItemName)
         const n = JSON.stringify(JSON.stringify(object))
-        str += (cur === null ? "" : `${cur },`) + n
+        str += (cur === null ? "" : `${cur},`) + n
 
         localStorage.setItem(this.lsItemName, str)
     }
@@ -102,12 +102,17 @@ export default class ReportStorage {
         this.#hooks.push({ hook: func, name })
     }
 
-    static async export() {
+    static async export({ currentOnly = false } = {}) {
         const os = await this.DBOS()
         let dbNotice = false
         let dbData = []
         try {
-            dbData = Array.from(await os.getAll())
+            dbData = Array.from((currentOnly
+                ? await os.getWhere(
+                    await os.createCursor(null, "prev", "read"),
+                    ((i) => i.session === Report.session.id),
+                )
+                : await os.getAll()))
         } catch (e) {
             dbNotice = e
         }

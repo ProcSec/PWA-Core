@@ -146,5 +146,6 @@ export default class SW {
 
     static onSW(func) {
         this.SWWaiters.push(func)
+        if (this.registration) func(this.registration)
     }
 }
