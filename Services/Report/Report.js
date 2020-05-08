@@ -22,7 +22,7 @@ export default class Report {
     }
 
     static add(log, tagsNames = [], { recursionStack = 0 } = {}) {
-        if (recursionStack > 3) return
+        if (recursionStack > 1) return
         delayAction(() => {
             const tags = []
             tags.push(ReportTags.get("default"))

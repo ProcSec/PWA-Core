@@ -103,10 +103,10 @@ export default class ReportStorage {
     }
 
     static async export({ currentOnly = false } = {}) {
-        const os = await this.DBOS()
         let dbNotice = false
         let dbData = []
         try {
+            const os = await this.DBOS()
             dbData = Array.from((currentOnly
                 ? await os.getWhere(
                     await os.createCursor(null, "prev", "read"),

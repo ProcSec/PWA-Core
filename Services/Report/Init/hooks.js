@@ -3,7 +3,7 @@ import {
     Report, ReportLogger, ReportSession, ReportStorage,
 } from ".."
 
-ReportStorage.addTransformHook(errorToObject, "errors")
+ReportStorage.addTransformHook((jk, value) => errorToObject(value), "errors")
 ReportSession.newHook((target, prop, value) => {
     Report.add([prop, value], ["report.session.update"])
     target[prop] = value
