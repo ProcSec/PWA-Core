@@ -14,11 +14,7 @@ export default class LanguageCore {
     }
 
     static get language() {
-        return {
-            strings: this.#language.strings,
-            library: this.#language.library,
-            info: this.#language.info,
-        }
+        return this.#language
     }
 
     static async defaultLang() {

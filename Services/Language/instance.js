@@ -10,6 +10,8 @@ export default class Language {
 
     info = false
 
+    static loadedPacks = {}
+
     constructor(code) {
         let l
         try {
@@ -30,26 +32,42 @@ export default class Language {
         this.info = l
     }
 
-    async loadData() {
+    syncLoadData() {
         try {
-            const { strings, library } = (
-                __PACKAGE_DOWNLOADABLE_LANG_PACKS
-                    ? await import(`@Resources/language/${this.info.dir}`)
-                    : require(`@Resources/language/${this.info.dir}`))
-            new FieldsContainer([
-                ["strings", "library"],
-                {
-                    strings: new FieldChecker({ type: "object" }),
-                    library: new FieldChecker({ type: "function" }),
-                },
-            ]).set({ strings, library })
-
-            this.strings = strings
-            this.library = library
-        } catch (e) {
+            this.postLoad(require(`@Resources/language/${this.info.dir}`))
+        } catch {
             throw new Error("Invalid language package")
         }
 
         return true
+    }
+
+    async loadData() {
+        try {
+            this.postLoad(
+                __PACKAGE_DOWNLOADABLE_LANG_PACKS
+                    ? await import(`@Resources/language/${this.info.dir}`)
+                    : require(`@Resources/language/${this.info.dir}`),
+            )
+        } catch {
+            throw new Error("Invalid language package")
+        }
+
+        return true
+    }
+
+    postLoad({ strings, library }) {
+        new FieldsContainer([
+            ["strings", "library"],
+            {
+                strings: new FieldChecker({ type: "object" }),
+                library: new FieldChecker({ type: "function" }),
+            },
+        ]).set({ strings, library })
+
+        this.strings = strings
+        this.library = library
+
+        this.constructor.loadedPacks[this.code] = this
     }
 }

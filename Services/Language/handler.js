@@ -1,46 +1,73 @@
+/* globals __PACKAGE_DOWNLOADABLE_LANG_PACKS */
 import FieldsContainer from "@Core/Tools/validation/fieldsContainer"
 import FieldChecker from "@Core/Tools/validation/fieldChecker"
 import ucFirst from "@Core/Tools/transformation/text/ucFirst"
 import { Report } from "../Report"
 import LanguageCore from "./core"
+import Language from "./instance"
 
-const languagePack = LanguageCore.language
+function fallback(string, p, full) {
+    const languagePack = LanguageCore.language
 
-let { strings, library } = languagePack
-
-function fallback(string) {
     try {
         string = string.toString()
-        if ("fallbackString" in library
-            && typeof library.fallbackString === "function") return library.fallbackString(string)
+        if ("fallbackString" in languagePack.library
+            && typeof languagePack.library.fallbackString === "function") return languagePack.library.fallbackString(string, p, full)
     } catch (e) {
         // Fallback to recovery
+    }
+
+    try {
+        const query = String(full)
+        if (!__PACKAGE_DOWNLOADABLE_LANG_PACKS
+            && languagePack
+            && languagePack.info
+            && Array.isArray(languagePack.info.fallback)) {
+            let fallbackCandidate = null
+
+            languagePack.info.fallback.some((e) => {
+                let fbLang = null
+
+                try {
+                    if (!(e in Language.loadedPacks)) {
+                        fbLang = new Language(e)
+                        fbLang.syncLoadData()
+                    } else fbLang = Language.loadedPacks[e]
+
+                    // eslint-disable-next-line no-use-before-define
+                    fallbackCandidate = $(query, p, false, fbLang)
+                    return true
+                } catch {
+                    return false
+                }
+            })
+
+            if (fallbackCandidate !== null) return fallbackCandidate
+        }
+    } catch (e) {
+        Report.add(e, "lang.stringError")
     }
 
     return `[${string}]`
 }
 
-function callLibrary(name, data, p, string) {
-    if (!(name in library)
-        || typeof library[name] !== "function") throw new Error("No such function in library")
+function callLibrary(pack, name, data, p, string) {
+    if (!(name in pack.library)
+        || typeof pack.library[name] !== "function") throw new Error("No such function in library")
 
-    return library[name](data, p, string)
+    return pack.library[name](data, p, string)
 }
 
-function $(string, p = undefined, useFallback = true) {
+function $(string, p = undefined, useFallback = true, pack = LanguageCore.language) {
+    const originalQuery = string
     try {
-        if (strings === undefined) {
-            const loaded = LanguageCore.language;
-            ({ strings, library } = loaded)
-        }
-
         if (typeof string !== "string") throw new TypeError("Localization key is string only")
 
-        let data = strings[string]
+        let data = pack.strings[string]
 
         if (string.match(/^[a-zA-Z0-9_/]+[^/]$/)) {
             const groups = string.split("/")
-            data = strings
+            data = pack.strings
             string = groups[groups.length - 1]
             while (groups.length && data !== undefined) {
                 data = data[groups.shift()]
@@ -64,7 +91,7 @@ function $(string, p = undefined, useFallback = true) {
                 },
             ]).set(data)
 
-            return callLibrary(data.name, data.data, p, string)
+            return callLibrary(pack, data.name, data.data, p, string)
         }
         if (data.type === "funcs") {
             new FieldsContainer([
@@ -78,7 +105,7 @@ function $(string, p = undefined, useFallback = true) {
             let res = data.data
 
             data.name.forEach((e) => {
-                res = callLibrary(data.name, res, p, string)
+                res = callLibrary(pack, data.name, res, p, string)
             })
 
             return res
@@ -88,7 +115,7 @@ function $(string, p = undefined, useFallback = true) {
     } catch (e) {
         if (useFallback) {
             Report.add(e, ["lang.stringError"])
-            return fallback(string)
+            return fallback(string, p, originalQuery)
         }
         throw e
     }
