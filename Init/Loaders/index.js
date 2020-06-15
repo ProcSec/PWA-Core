@@ -1,4 +1,4 @@
-import "./transformators"
+// import "./transformators"
 import "./FeatureChecker"
 import "@Environment/Loaders"
 import "@App/loaders"
