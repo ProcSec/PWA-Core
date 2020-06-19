@@ -27,6 +27,16 @@ export default class Design {
         return get
     }
 
+    static get scaffoldMode() {
+        return this.getVar("flag-scaffold-mode", true)
+    }
+
+    static onScaffoldModeUpdate(f) {
+        const MobileMediaQuery = window.matchMedia("(max-width: 500px)")
+        MobileMediaQuery.addListener(f)
+        return MobileMediaQuery
+    }
+
     static async dafaultThemeHandler() {
         const loadDark = async () => {
             await this.themeLoader(this.presetDarkTheme, true)

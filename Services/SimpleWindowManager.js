@@ -58,11 +58,46 @@ export default class WindowManager {
     static get fullscreen() { return document.webkitFullscreenElement !== null }
 
     static newWindow(h) {
-        const w = new DOM({
+        let w
+
+        const movementListener = (ev) => {
+            w.elementParse.native.scrollBy({ left: -ev.movementX })
+        }
+        const endListener = (ev) => {
+            window.removeEventListener("mouseup", endListener, { passive: true })
+            window.removeEventListener("mousemove", movementListener, { passive: true })
+        }
+        const startListener = () => {
+            window.addEventListener("mouseup", endListener, { passive: true })
+            window.addEventListener("mousemove", movementListener, { passive: true })
+        }
+
+        const listener = () => {
+            if (w.elementParse.native.scrollWidth > w.elementParse.native.clientWidth) {
+                w.style({
+                    cursor: "w-resize",
+                })
+                window.addEventListener("mousedown", startListener, { passive: true })
+            } else {
+                w.style({
+                    cursor: "",
+                })
+                window.removeEventListener("mousedown", startListener, { passive: true })
+            }
+        }
+
+        w = new DOM({
             new: "div",
             class: "s--wm-awi",
             id: `s--wm-win-${this.windows.length}`,
-
+            onRendered() {
+                listener(this)
+                window.addEventListener("resize", listener)
+            },
+            onClear() {
+                listener(this)
+                window.addEventListener("resize", listener)
+            },
         })
 
         const generated = w
