@@ -144,4 +144,22 @@ export default class Design {
     static parseRgba(str) {
         return str.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/).slice(1)
     }
+
+    static get vh() {
+        const h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0)
+        return h / 100
+    }
+
+    static get vw() {
+        const w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0)
+        return w / 100
+    }
+
+    static get vmin() {
+        return Math.min(this.vh, this.vw)
+    }
+
+    static get vmax() {
+        return Math.max(this.vh, this.vw)
+    }
 }
