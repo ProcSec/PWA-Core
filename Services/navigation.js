@@ -3,7 +3,6 @@ import FieldChecker from "@Core/Tools/validation/fieldChecker"
 import { Nav } from "@Environment/Library/DOM/buildBlock"
 import { Report, ReportSession } from "./Report"
 
-
 window.history.replaceState({ pointer: 0, session: ReportSession.id }, "")
 
 export default class Navigation {
