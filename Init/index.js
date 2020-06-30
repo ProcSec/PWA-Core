@@ -17,8 +17,7 @@ if (process.env.NODE_ENV === "development") {
     require("@App/debug/dev")
 }
 
-
 Report.add(String(App.appName), ["APP"])
-Report.add(`${App.version} (${App.branch}) / ${App.buildDate}`, ["VERSION"])
+Report.add(`${App.version} [${App.build}] (${App.branch}) / ${App.buildDate}`, ["VERSION"])
 Report.add(String(App.debug), ["DEBUG"])
 Report.add([], ["dummy"])

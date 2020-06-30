@@ -1,4 +1,4 @@
-/* global __PACKAGE_VERSION_NUMBER, __PACKAGE_BUILD_TIME,
+/* global __PACKAGE_VERSION_NUMBER, __PACKAGE_BUILD_TIME, __PACKAGE_BUILD,
 __PACKAGE_APP_NAME, __PACKAGE_BRANCH, __PACKAGE_CHANGELOG, __PACKAGE_BUILD_FLAGS */
 
 export default class App {
@@ -8,6 +8,10 @@ export default class App {
 
     static get buildDate() {
         return __PACKAGE_BUILD_TIME
+    }
+
+    static get build() {
+        return __PACKAGE_BUILD
     }
 
     static get appName() {
