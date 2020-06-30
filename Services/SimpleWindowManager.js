@@ -72,17 +72,25 @@ export default class WindowManager {
             window.addEventListener("mousemove", movementListener, { passive: true })
         }
 
+        const self = this
+
+        const wheelListener = (ev) => {
+            this.controlWin.elementParse.native.scrollBy({ top: ev.deltaY * 2, behavior: "smooth" })
+        }
+
         const listener = () => {
             if (w.elementParse.native.scrollWidth > w.elementParse.native.clientWidth) {
                 w.style({
                     cursor: "w-resize",
                 })
                 window.addEventListener("mousedown", startListener, { passive: true })
+                this.controlWin.elementParse.native.addEventListener("wheel", wheelListener, { passive: true })
             } else {
                 w.style({
                     cursor: "",
                 })
                 window.removeEventListener("mousedown", startListener, { passive: true })
+                this.controlWin.elementParse.native.removeEventListener("wheel", wheelListener, { passive: true })
             }
         }
 
@@ -103,7 +111,6 @@ export default class WindowManager {
         const generated = w
         const prev = this.currentWindow.element
         this.windows.push(generated)
-        const self = this
 
         async function basicTransition() {
             await new FadeOut({ duration: 200 }).apply(self.controlWin)
