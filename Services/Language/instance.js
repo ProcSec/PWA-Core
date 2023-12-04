@@ -22,7 +22,7 @@ export default class Language {
                     code: new FieldChecker({ type: "string", symbols: "a-z-" }),
                     name: new FieldChecker({ type: "string" }),
                     dir: new FieldChecker({ type: "string", symbols: "a-z-" }),
-                    author: new FieldChecker({ type: "string", symbols: "a-zA-Zа-яА-Я._#@*-" }),
+                    author: new FieldChecker({ type: "string", symbols: "a-zA-Zа-яА-Я._#@*-\\s" }),
                 },
             ]).set(l)
         } catch (e) {
